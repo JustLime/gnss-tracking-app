@@ -66,6 +66,7 @@ dependencies {
     // Added third party libraries
     implementation(libs.osmdroid.android)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.navigation.compose)
 
     testImplementation(libs.junit)
 
