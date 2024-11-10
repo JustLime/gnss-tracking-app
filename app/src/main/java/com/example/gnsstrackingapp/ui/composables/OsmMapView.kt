@@ -1,4 +1,4 @@
-package com.example.gnsstrackingapp.views
+package com.example.gnsstrackingapp.ui.composables
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -13,18 +13,15 @@ import com.example.gnsstrackingapp.R
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
 
 @Composable
-fun MapView(
-    modifier: Modifier = Modifier,
-    onLoad: ((map: MapView) -> Unit)? = null
+fun OsmMapView(
+    modifier: Modifier = Modifier, onLoad: ((map: MapView) -> Unit)? = null
 ) {
     val mapViewState = rememberMapViewWithLifecycle()
 
     AndroidView(
-        { mapViewState },
-        modifier
+        { mapViewState }, modifier
     ) {
 
             mapView ->
@@ -49,10 +46,10 @@ fun MapView(
         val startPoint = GeoPoint(48.947410, 9.144216)
         mapController.setCenter(startPoint)
 
-        val marker = Marker(mapView)
-        marker.position = startPoint
-        marker.title = "Bietigheim-Bissingen"
-        mapView.overlays.add(marker)
+//        val marker = Marker(mapView)
+//        marker.position = startPoint
+//        marker.title = "Bietigheim-Bissingen"
+//        mapView.overlays.add(marker)
 
         // Handle marker click events
 //        marker.setOnMarkerClickListener { _, _ ->
@@ -88,13 +85,12 @@ fun rememberMapViewWithLifecycle(): MapView {
 }
 
 @Composable
-fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver =
-    remember(mapView) {
-        LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-                else -> {}
-            }
+fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver = remember(mapView) {
+    LifecycleEventObserver { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> mapView.onResume()
+            Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+            else -> {}
         }
     }
+}
