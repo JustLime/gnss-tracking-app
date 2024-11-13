@@ -7,19 +7,28 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.gnsstrackingapp.ui.composables.OsmMapView
 
 @Composable
@@ -41,7 +50,9 @@ fun HomeScreen() {
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                SettingsButton(onClick = {})
+                SettingsButton(onClick = {
+                    
+                })
             }
 
             Row(
@@ -51,6 +62,13 @@ fun HomeScreen() {
             ) {
                 GetOwnLocationButton(onClick = {})
             }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            StatBottomSheet()
         }
     }
 }
@@ -71,5 +89,48 @@ fun SettingsButton(onClick: () -> Unit) {
         shape = CircleShape,
     ) {
         Icon(Icons.Filled.Settings, "Floating settings button.")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StatBottomSheet() {
+    val bottomSheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.Expanded
+    )
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = bottomSheetState
+    )
+
+    BottomSheetScaffold(
+        sheetContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Row {
+                        Text(
+                            text = "ZED-F9P",
+                            fontSize = 20.sp,
+                            fontWeight = Bold
+                        )
+                    }
+
+                    Row {
+                        Text(
+                            text = "Connected: ",
+                            fontSize = 16.sp,
+                        )
+                        Text(text = "yes")
+                    }
+                }
+            }
+        },
+        scaffoldState = scaffoldState
+    )
+    {
+
     }
 }
