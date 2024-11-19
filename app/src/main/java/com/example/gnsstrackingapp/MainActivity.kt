@@ -15,6 +15,8 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -26,23 +28,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.preference.PreferenceManager
 import com.example.gnsstrackingapp.ui.MainNavigation
 import com.example.gnsstrackingapp.ui.Screen
-import com.example.gnsstrackingapp.ui.composables.rememberMapViewWithLifecycle
 import com.example.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
 import org.osmdroid.config.Configuration
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge(
-//            statusBarStyle = SystemBarStyle.dark(
-//                android.graphics.Color.RED,
-//            )
-//        )
 
         Configuration.getInstance().load(
             applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -51,7 +48,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             GNSSTrackingAppTheme {
                 val navHostController = rememberNavController()
-                val mapView = rememberMapViewWithLifecycle()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -93,11 +89,19 @@ fun NavigationBarComponent(navController: NavController) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 icon = {
-                    Icon(
-                        if (selectedItem.intValue == index) selectedIcons[index]
-                        else unselectedIcons[index],
-                        contentDescription = item
-                    )
+                    BadgedBox(badge = {
+                        if (screens[index].hasUpdated == true) {
+                            Badge(containerColor = Color.Green)
+                        } else if (screens[index].hasUpdated == false) {
+                            Badge(containerColor = Color.Red)
+                        }
+                    }) {
+                        Icon(
+                            if (selectedItem.intValue == index) selectedIcons[index]
+                            else unselectedIcons[index],
+                            contentDescription = item
+                        )
+                    }
                 },
                 label = { Text(item) },
                 selected = selectedItem.intValue == index,
@@ -109,5 +113,3 @@ fun NavigationBarComponent(navController: NavController) {
         }
     }
 }
-
-

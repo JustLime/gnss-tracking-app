@@ -46,11 +46,11 @@ fun OsmMapView(
         mapController.setZoom(zoomFactor)
         mapController.setCenter(startPoint)
 
-//        mapView.controller.animateTo(
+//        mapController.animateTo(
 //            GeoPoint(48.947410, 9.144216), 20.0, 2000L, 20.0F
 //        )
 //
-//        mapView.controller.animateTo(
+//        mapController.animateTo(
 //            GeoPoint(48.942, 9.144216), 20.0, 2000L, 20.0F
 //        )
 
