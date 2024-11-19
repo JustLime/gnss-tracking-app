@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gnsstrackingapp.ui.composables.OsmMapView
+import com.example.gnsstrackingapp.ui.composables.OsmMap
 
 @Composable
 fun MapScreen(navController: NavController) {
@@ -43,7 +43,7 @@ fun MapScreen(navController: NavController) {
                 .fillMaxHeight(0.7f)
                 .clip(RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp))
         ) {
-            OsmMapView()
+            OsmMap()
 
             Row(
                 horizontalArrangement = Arrangement.End,
