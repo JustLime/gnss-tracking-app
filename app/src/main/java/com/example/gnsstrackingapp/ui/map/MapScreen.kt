@@ -4,16 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -30,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gnsstrackingapp.ui.composables.OsmMap
+import com.example.gnsstrackingapp.ui.composables.OsmMapView
 
 @Composable
 fun MapScreen(navController: NavController) {
@@ -39,22 +36,10 @@ fun MapScreen(navController: NavController) {
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.7f)
+                .fillMaxSize()
                 .clip(RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp))
         ) {
-            OsmMap()
-
-            Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                SettingsButton(onClick = {
-
-                })
-            }
+            OsmMapView()
 
             Row(
                 horizontalArrangement = Arrangement.End,
@@ -65,12 +50,12 @@ fun MapScreen(navController: NavController) {
             }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            StatBottomSheet()
-        }
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//        ) {
+//            StatBottomSheet()
+//        }
     }
 }
 
@@ -80,16 +65,6 @@ fun GetOwnLocationButton(onClick: () -> Unit) {
         onClick = { onClick() }, modifier = Modifier.padding(16.dp)
     ) {
         Icon(Icons.Filled.LocationOn, "Floating action button.")
-    }
-}
-
-@Composable
-fun SettingsButton(onClick: () -> Unit) {
-    FloatingActionButton(
-        onClick = { onClick() },
-        shape = CircleShape,
-    ) {
-        Icon(Icons.Filled.Settings, "Floating settings button.")
     }
 }
 
@@ -135,3 +110,4 @@ fun StatBottomSheet() {
 
     }
 }
+

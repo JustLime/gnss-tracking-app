@@ -10,9 +10,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -29,6 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.preference.PreferenceManager
 import com.example.gnsstrackingapp.ui.MainNavigation
 import com.example.gnsstrackingapp.ui.Screen
+import com.example.gnsstrackingapp.ui.composables.rememberMapViewWithLifecycle
 import com.example.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
 import org.osmdroid.config.Configuration
 
@@ -48,6 +51,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             GNSSTrackingAppTheme {
                 val navHostController = rememberNavController()
+                val mapView = rememberMapViewWithLifecycle()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -72,15 +76,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NavigationBarComponent(navController: NavController) {
     val selectedItem = remember { mutableIntStateOf(0) }
-    val items = listOf("Home", "Map", "Statistics")
-    val screens = listOf(Screen.HomeScreen, Screen.MapScreen, Screen.StatisticsScreen)
+    val items = listOf("Home", "Map", "Statistics", "Settings")
+    val screens =
+        listOf(Screen.HomeScreen, Screen.MapScreen, Screen.StatisticsScreen, Screen.SettingsScreen)
     val selectedIcons =
-        listOf(Icons.Filled.Home, Icons.Filled.LocationOn, Icons.Filled.Info)
+        listOf(Icons.Filled.Home, Icons.Filled.LocationOn, Icons.Filled.Info, Icons.Filled.Settings)
     val unselectedIcons =
         listOf(
             Icons.Outlined.Home,
             Icons.Outlined.LocationOn,
-            Icons.Outlined.Info
+            Icons.Outlined.Info,
+            Icons.Outlined.Settings
         )
 
     NavigationBar {

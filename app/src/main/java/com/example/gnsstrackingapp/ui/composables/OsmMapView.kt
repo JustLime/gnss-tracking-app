@@ -16,26 +16,28 @@ import com.example.gnsstrackingapp.ui.theme.Purple40
 import com.example.gnsstrackingapp.ui.theme.Purple80
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polygon
 
 
 @Composable
-fun OsmMap(
-    modifier: Modifier = Modifier, onLoad: ((map: MapView) -> Unit)? = null
+fun OsmMapView(
+    modifier: Modifier = Modifier, onLoad: ((map: MapView) -> Unit)? = null,
+    mapView: MapView = rememberMapViewWithLifecycle()
 ) {
-    val mapViewState = rememberMapViewWithLifecycle()
-
     AndroidView(
-        factory = { mapViewState }, modifier
-    ) { mapView ->
+        factory = { mapView }, modifier
+    ) {
         onLoad?.invoke(mapView)
 
         mapView.setUseDataConnection(true)
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+        mapView.setMultiTouchControls(true)
+        mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
 
         val mapController = mapView.controller
-        val zoomFactor = 20.0
+        val zoomFactor = 16.0
         val radiusOwnLocation = 3.0
         val startPoint = GeoPoint(48.947410, 9.144216)
 
@@ -44,16 +46,15 @@ fun OsmMap(
         mapController.setZoom(zoomFactor)
         mapController.setCenter(startPoint)
 
+//        mapView.controller.animateTo(
+//            GeoPoint(48.947410, 9.144216), 20.0, 2000L, 20.0F
+//        )
+//
+//        mapView.controller.animateTo(
+//            GeoPoint(48.942, 9.144216), 20.0, 2000L, 20.0F
+//        )
 
-        mapView.controller.animateTo(
-            GeoPoint(48.947410, 9.144216), 20.0, 2000L, 20.0F
-        )
-
-        mapView.controller.animateTo(
-            GeoPoint(48.942, 9.144216), 20.0, 2000L, 20.0F
-        )
-
-//        mapView.overlays.add(circle)
+        mapView.overlays.add(circle)
 
         // Refresh the map
         mapView.invalidate()
