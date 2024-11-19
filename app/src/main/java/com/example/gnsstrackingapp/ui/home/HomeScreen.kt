@@ -29,20 +29,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.gnsstrackingapp.ui.composables.OsmMapView
+import com.example.gnsstrackingapp.ui.composables.OsmMap
 
 @Composable
 fun HomeScreen() {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
+    Column {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.7f)
                 .clip(RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp))
         ) {
-            OsmMapView()
+            OsmMap()
 
             Row(
                 horizontalArrangement = Arrangement.End,
@@ -51,7 +49,7 @@ fun HomeScreen() {
                     .padding(16.dp)
             ) {
                 SettingsButton(onClick = {
-                    
+
                 })
             }
 
@@ -66,6 +64,7 @@ fun HomeScreen() {
 
         Box(
             modifier = Modifier
+//                .offset(y = (-30).dp)
                 .fillMaxSize()
         ) {
             StatBottomSheet()
@@ -112,9 +111,7 @@ fun StatBottomSheet() {
                 Column(Modifier.padding(16.dp)) {
                     Row {
                         Text(
-                            text = "ZED-F9P",
-                            fontSize = 20.sp,
-                            fontWeight = Bold
+                            text = "ZED-F9P", fontSize = 20.sp, fontWeight = Bold
                         )
                     }
 
@@ -127,10 +124,8 @@ fun StatBottomSheet() {
                     }
                 }
             }
-        },
-        scaffoldState = scaffoldState
-    )
-    {
+        }, scaffoldState = scaffoldState
+    ) {
 
     }
 }
