@@ -28,9 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gnsstrackingapp.ui.composables.OsmMapView
+import org.osmdroid.util.GeoPoint
 
 @Composable
-fun MapScreen(navController: NavController) {
+fun MapScreen(navController: NavController, currentLocation: GeoPoint) {
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
@@ -39,7 +40,7 @@ fun MapScreen(navController: NavController) {
                 .fillMaxSize()
                 .clip(RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp))
         ) {
-            OsmMapView()
+            OsmMapView(currentLocation = currentLocation)
 
             Row(
                 horizontalArrangement = Arrangement.End,

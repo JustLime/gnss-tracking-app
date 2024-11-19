@@ -1,47 +1,81 @@
 package com.example.gnsstrackingapp.ui.home
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gnsstrackingapp.ui.Screen
 import com.example.gnsstrackingapp.ui.composables.OsmMapView
+import org.osmdroid.util.GeoPoint
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, currentLocation: GeoPoint) {
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = Modifier
             .padding(all = 16.dp)
-//            .border(1.dp, Color.Black)
     ) {
-        ElevatedCard(
+        Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
+                .fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                containerColor = Color.Transparent,
             ),
 
             ) {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.LocationOn,
+                        contentDescription = "Location",
+                        modifier = Modifier.scale(1.5f)
 
+                    )
+                    Text(
+                        text = "Bietigheim-Bissingen",
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "${currentLocation.latitude}°",
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    Text(
+                        text = "${currentLocation.longitude}°",
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
         }
 
         ElevatedCard(
             modifier = Modifier
                 .height(300.dp)
-                .clickable(onClick = { navController.navigate(Screen.MapScreen.route) })
         ) {
-            OsmMapView()
+            OsmMapView(currentLocation = currentLocation)
         }
     }
 }

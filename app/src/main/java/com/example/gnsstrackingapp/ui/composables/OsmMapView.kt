@@ -24,7 +24,8 @@ import org.osmdroid.views.overlay.Polygon
 @Composable
 fun OsmMapView(
     modifier: Modifier = Modifier, onLoad: ((map: MapView) -> Unit)? = null,
-    mapView: MapView = rememberMapViewWithLifecycle()
+    mapView: MapView = rememberMapViewWithLifecycle(),
+    currentLocation: GeoPoint
 ) {
     AndroidView(
         factory = { mapView }, modifier
@@ -39,12 +40,11 @@ fun OsmMapView(
         val mapController = mapView.controller
         val zoomFactor = 16.0
         val radiusOwnLocation = 3.0
-        val startPoint = GeoPoint(48.947410, 9.144216)
 
-        val circle = drawOwnLocationCircle(startPoint, radiusOwnLocation, zoomFactor)
+        val circle = drawOwnLocationCircle(currentLocation, radiusOwnLocation, zoomFactor)
 
         mapController.setZoom(zoomFactor)
-        mapController.setCenter(startPoint)
+        mapController.setCenter(currentLocation)
 
 //        mapController.animateTo(
 //            GeoPoint(48.947410, 9.144216), 20.0, 2000L, 20.0F

@@ -26,6 +26,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +37,7 @@ import com.example.gnsstrackingapp.ui.MainNavigation
 import com.example.gnsstrackingapp.ui.Screen
 import com.example.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
 import org.osmdroid.config.Configuration
+import org.osmdroid.util.GeoPoint
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +50,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             GNSSTrackingAppTheme {
                 val navHostController = rememberNavController()
+                val currentLocation = remember {
+                    mutableStateOf(GeoPoint(48.947410, 9.144216))
+                }
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -59,7 +64,7 @@ class MainActivity : ComponentActivity() {
                         },
                         content = { padding ->
                             Column(Modifier.padding(padding)) {
-                                MainNavigation(navHostController)
+                                MainNavigation(navHostController, currentLocation.value)
                             }
                         }
                     )
@@ -113,3 +118,5 @@ fun NavigationBarComponent(navController: NavController) {
         }
     }
 }
+
+

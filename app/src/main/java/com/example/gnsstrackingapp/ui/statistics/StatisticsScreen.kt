@@ -1,10 +1,76 @@
 package com.example.gnsstrackingapp.ui.statistics
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.gnsstrackingapp.ui.data.GnssOutput
+
+// {
+// "time": "161931.00",
+// "lon": "00731.4644883",
+// "exception": null,
+// "lat": "5037.7607264",
+// "fixType": 1,
+// "hAcc": 19838,
+// "vAcc": 32370,
+// "elev": "257.601",
+// "rtcmEnabled": false
+// }
 
 @Composable
 fun StatisticsScreen(navController: NavController) {
-    Text(text = "Statistics")
+    val typography = Typography()
+    val gnssOutput = remember {
+        mutableStateOf(
+            GnssOutput(
+                time = "161931.00",
+                lon = "00731.4644883",
+                exception = "",
+                lat = "5037.7607264",
+                fixType = 1,
+                hAcc = 19838,
+                vAcc = 32370,
+                elev = "257.601",
+                rtcmEnabled = false
+            )
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp)
+    ) {
+        Text(
+            text = "Statistics",
+            fontSize = typography.headlineLarge.fontSize
+        )
+
+        ElevatedCard {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(text = "Time: ${gnssOutput.value.time}")
+                Text(text = "Longitude: ${gnssOutput.value.lon}")
+                Text(text = "Latitude: ${gnssOutput.value.lat}")
+                Text(text = "Fix Type: ${gnssOutput.value.fixType}")
+                Text(text = "Horizontal Accuracy: ${gnssOutput.value.hAcc}")
+                Text(text = "Vertical Accuracy: ${gnssOutput.value.vAcc}")
+                Text(text = "Elevation: ${gnssOutput.value.elev}")
+                Text(text = "RTCM Enabled: ${gnssOutput.value.rtcmEnabled}")
+            }
+        }
+    }
 }
