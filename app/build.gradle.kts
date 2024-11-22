@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.osmdroid.android)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.play.services.location)
 
     testImplementation(libs.junit)
 

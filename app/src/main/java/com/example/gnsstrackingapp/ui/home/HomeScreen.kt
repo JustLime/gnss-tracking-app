@@ -4,13 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.gnsstrackingapp.ui.composables.OsmMapView
 import org.osmdroid.util.GeoPoint
 
 @Composable
@@ -58,12 +55,12 @@ fun HomeScreen(navController: NavController, currentLocation: GeoPoint) {
                 }
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        text = "${currentLocation.latitude}°",
+                        text = "${currentLocation.latitude}° N",
                         fontSize = 20.sp,
                         modifier = Modifier.padding(16.dp)
                     )
                     Text(
-                        text = "${currentLocation.longitude}°",
+                        text = "${currentLocation.longitude}° O",
                         fontSize = 20.sp,
                         modifier = Modifier.padding(16.dp)
                     )
@@ -71,11 +68,11 @@ fun HomeScreen(navController: NavController, currentLocation: GeoPoint) {
             }
         }
 
-        ElevatedCard(
-            modifier = Modifier
-                .height(300.dp)
-        ) {
-            OsmMapView(currentLocation = currentLocation)
-        }
+//        ElevatedCard(
+//            modifier = Modifier
+//                .height(300.dp)
+//        ) {
+//            OsmMapView(currentLocation = currentLocation)
+//        }
     }
 }

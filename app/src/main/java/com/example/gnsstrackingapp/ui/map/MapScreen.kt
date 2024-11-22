@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.BottomSheetScaffold
@@ -22,43 +21,90 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.example.gnsstrackingapp.ui.composables.OsmMapView
+import androidx.compose.ui.viewinterop.AndroidView
+import com.example.gnsstrackingapp.ui.composables.drawOwnLocationCircle
+import com.example.gnsstrackingapp.ui.composables.rememberMapViewWithLifecycle
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.overlay.compass.CompassOverlay
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 @Composable
-fun MapScreen(navController: NavController, currentLocation: GeoPoint) {
+fun MapScreen(
+    viewModel: MapViewModel
+) {
+    val mapView = rememberMapViewWithLifecycle()
+
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(0.dp, 0.dp, 16.dp, 16.dp))
         ) {
-            OsmMapView(currentLocation = currentLocation)
+            AndroidView(
+                factory = { mapView },
+                modifier = Modifier.fillMaxSize(),
+                update = { mapView ->
+                    mapView.apply {
+                        setUseDataConnection(true)
+                        setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+                        setMultiTouchControls(true)
+                        zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+
+                        controller.setZoom(viewModel.zoomLevel)
+                        controller.setCenter(viewModel.centerLocation)
+
+                        mapView.mapOrientation = viewModel.mapOrientation
+
+                        val compassOverlay = CompassOverlay(
+                            this.context, mapView
+                        )
+                        compassOverlay.enableCompass()
+
+                        val rotationGestureOverlay = RotationGestureOverlay(mapView)
+                        rotationGestureOverlay.isEnabled = true
+
+                        val circle = drawOwnLocationCircle(
+                            viewModel.centerLocation, 3.0, viewModel.zoomLevel
+                        )
+
+                        overlays.clear()
+                        overlays.add(circle)
+                        overlays.add(compassOverlay)
+
+                        invalidate()
+                    }
+                }
+            )
 
             Row(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier.fillMaxSize()
             ) {
-                GetOwnLocationButton(onClick = {})
+                GetOwnLocationButton(onClick = {
+                    val newLocation = GeoPoint(48.947410, 9.144216)
+                    viewModel.centerLocation = newLocation
+                    viewModel.zoomLevel = 20.0
+                    viewModel.mapOrientation = 20f
+
+                    mapView.controller.animateTo(
+                        newLocation,
+                        viewModel.zoomLevel,
+                        2000L,
+                        viewModel.mapOrientation
+                    )
+                })
             }
         }
-
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//        ) {
-//            StatBottomSheet()
-//        }
     }
 }
+
 
 @Composable
 fun GetOwnLocationButton(onClick: () -> Unit) {

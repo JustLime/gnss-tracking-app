@@ -1,6 +1,11 @@
 package com.example.gnsstrackingapp.ui.composables
 
 import android.graphics.Paint
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -23,41 +28,53 @@ import org.osmdroid.views.overlay.Polygon
 
 @Composable
 fun OsmMapView(
-    modifier: Modifier = Modifier, onLoad: ((map: MapView) -> Unit)? = null,
-    mapView: MapView = rememberMapViewWithLifecycle(),
+    modifier: Modifier = Modifier,
     currentLocation: GeoPoint
 ) {
-    AndroidView(
-        factory = { mapView }, modifier
-    ) {
-        onLoad?.invoke(mapView)
+    // Zustand für die MapView
+    val context = LocalContext.current
+    val mapView = remember { MapView(context) }
 
-        mapView.setUseDataConnection(true)
-        mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
-        mapView.setMultiTouchControls(true)
-        mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+    // Benutzeroberfläche
+    Column(modifier = modifier.fillMaxSize()) {
+        // Karte anzeigen
+        AndroidView(
+            factory = {
+                mapView.apply {
+                    setUseDataConnection(true)
+                    setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+                    setMultiTouchControls(true)
+                    zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
 
-        val mapController = mapView.controller
-        val zoomFactor = 16.0
-        val radiusOwnLocation = 3.0
+                    val mapController = controller
+                    val zoomFactor = 16.0
+                    val radiusOwnLocation = 3.0
 
-        val circle = drawOwnLocationCircle(currentLocation, radiusOwnLocation, zoomFactor)
+                    val circle =
+                        drawOwnLocationCircle(currentLocation, radiusOwnLocation, zoomFactor)
 
-        mapController.setZoom(zoomFactor)
-        mapController.setCenter(currentLocation)
+                    mapController.setZoom(zoomFactor)
+                    mapController.setCenter(currentLocation)
+                    overlays.add(circle)
 
-//        mapController.animateTo(
-//            GeoPoint(48.947410, 9.144216), 20.0, 2000L, 20.0F
-//        )
-//
-//        mapController.animateTo(
-//            GeoPoint(48.942, 9.144216), 20.0, 2000L, 20.0F
-//        )
+                    invalidate() // Refresh
+                }
+            },
+            modifier = Modifier.weight(1f) // Karte nimmt den verfügbaren Platz ein
+        )
 
-        mapView.overlays.add(circle)
-
-        // Refresh the map
-        mapView.invalidate()
+        // Steuerungs-Button
+        Button(
+            onClick = {
+                // Beispiel: Zoom erhöhen
+                mapView.controller.zoomIn()
+                // Oder zu einer anderen Position springen
+                mapView.controller.setCenter(GeoPoint(48.947410, 9.144216))
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Bewegen und Zoomen")
+        }
     }
 }
 
