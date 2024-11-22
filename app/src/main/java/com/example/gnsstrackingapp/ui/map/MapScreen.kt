@@ -30,7 +30,8 @@ import org.osmdroid.util.GeoPoint
 
 @Composable
 fun MapScreen(
-    viewModel: MapViewModel
+    viewModel: MapViewModel,
+    currentLocation: GeoPoint
 ) {
     val mapView = rememberMapViewWithLifecycle()
 
@@ -41,7 +42,7 @@ fun MapScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            OsmMapView(mapView = mapView, viewModel = viewModel)
+            OsmMapView(mapView = mapView, viewModel = viewModel, currentLocation = currentLocation)
 
             Row(
                 horizontalArrangement = Arrangement.End,
@@ -49,15 +50,14 @@ fun MapScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 GetOwnLocationButton(onClick = {
-                    val newLocation = GeoPoint(48.947410, 9.144216)
-                    viewModel.centerLocation = newLocation
+                    viewModel.centerLocation = currentLocation
                     viewModel.zoomLevel = 20.0
                     viewModel.mapOrientation = 20f
 
                     mapView.controller.animateTo(
-                        newLocation,
+                        currentLocation,
                         viewModel.zoomLevel,
-                        2000L,
+                        3000L,
                         viewModel.mapOrientation
                     )
                 })

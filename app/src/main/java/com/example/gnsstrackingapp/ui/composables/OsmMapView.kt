@@ -29,7 +29,8 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 fun OsmMapView(
     modifier: Modifier = Modifier,
     mapView: MapView,
-    viewModel: MapViewModel
+    viewModel: MapViewModel,
+    currentLocation: GeoPoint
 ) {
     AndroidView(
         factory = { mapView },
@@ -40,6 +41,8 @@ fun OsmMapView(
                 setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
                 setMultiTouchControls(true)
                 zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+
+                viewModel.centerLocation = currentLocation
 
                 controller.setZoom(viewModel.zoomLevel)
                 controller.setCenter(viewModel.centerLocation)
