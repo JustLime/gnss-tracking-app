@@ -24,14 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import com.example.gnsstrackingapp.ui.composables.drawOwnLocationCircle
+import com.example.gnsstrackingapp.ui.composables.OsmMapView
 import com.example.gnsstrackingapp.ui.composables.rememberMapViewWithLifecycle
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.CustomZoomButtonsController
-import org.osmdroid.views.overlay.compass.CompassOverlay
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 @Composable
 fun MapScreen(
@@ -46,41 +41,7 @@ fun MapScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            AndroidView(
-                factory = { mapView },
-                modifier = Modifier.fillMaxSize(),
-                update = { mapView ->
-                    mapView.apply {
-                        setUseDataConnection(true)
-                        setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
-                        setMultiTouchControls(true)
-                        zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-
-                        controller.setZoom(viewModel.zoomLevel)
-                        controller.setCenter(viewModel.centerLocation)
-
-                        mapView.mapOrientation = viewModel.mapOrientation
-
-                        val compassOverlay = CompassOverlay(
-                            this.context, mapView
-                        )
-                        compassOverlay.enableCompass()
-
-                        val rotationGestureOverlay = RotationGestureOverlay(mapView)
-                        rotationGestureOverlay.isEnabled = true
-
-                        val circle = drawOwnLocationCircle(
-                            viewModel.centerLocation, 3.0, viewModel.zoomLevel
-                        )
-
-                        overlays.clear()
-                        overlays.add(circle)
-                        overlays.add(compassOverlay)
-
-                        invalidate()
-                    }
-                }
-            )
+            OsmMapView(mapView = mapView, viewModel = viewModel)
 
             Row(
                 horizontalArrangement = Arrangement.End,

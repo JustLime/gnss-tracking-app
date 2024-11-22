@@ -1,11 +1,7 @@
 package com.example.gnsstrackingapp.ui.composables
 
 import android.graphics.Paint
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
@@ -17,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.gnsstrackingapp.R
+import com.example.gnsstrackingapp.ui.map.MapViewModel
 import com.example.gnsstrackingapp.ui.theme.Purple40
 import com.example.gnsstrackingapp.ui.theme.Purple80
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -24,58 +21,51 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polygon
+import org.osmdroid.views.overlay.compass.CompassOverlay
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 
 @Composable
 fun OsmMapView(
     modifier: Modifier = Modifier,
-    currentLocation: GeoPoint
+    mapView: MapView,
+    viewModel: MapViewModel
 ) {
-    // Zustand für die MapView
-    val context = LocalContext.current
-    val mapView = remember { MapView(context) }
+    AndroidView(
+        factory = { mapView },
+        modifier = modifier.fillMaxSize(),
+        update = { mapViewUpdate ->
+            mapViewUpdate.apply {
+                setUseDataConnection(true)
+                setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+                setMultiTouchControls(true)
+                zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
 
-    // Benutzeroberfläche
-    Column(modifier = modifier.fillMaxSize()) {
-        // Karte anzeigen
-        AndroidView(
-            factory = {
-                mapView.apply {
-                    setUseDataConnection(true)
-                    setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
-                    setMultiTouchControls(true)
-                    zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+                controller.setZoom(viewModel.zoomLevel)
+                controller.setCenter(viewModel.centerLocation)
 
-                    val mapController = controller
-                    val zoomFactor = 16.0
-                    val radiusOwnLocation = 3.0
+                mapView.mapOrientation = viewModel.mapOrientation
 
-                    val circle =
-                        drawOwnLocationCircle(currentLocation, radiusOwnLocation, zoomFactor)
+                val compassOverlay = CompassOverlay(
+                    this.context, mapView
+                )
+                compassOverlay.enableCompass()
 
-                    mapController.setZoom(zoomFactor)
-                    mapController.setCenter(currentLocation)
-                    overlays.add(circle)
+                val rotationGestureOverlay = RotationGestureOverlay(mapView)
+                rotationGestureOverlay.isEnabled = true
 
-                    invalidate() // Refresh
-                }
-            },
-            modifier = Modifier.weight(1f) // Karte nimmt den verfügbaren Platz ein
-        )
+                val circle = drawOwnLocationCircle(
+                    viewModel.centerLocation, 3.0, viewModel.zoomLevel
+                )
 
-        // Steuerungs-Button
-        Button(
-            onClick = {
-                // Beispiel: Zoom erhöhen
-                mapView.controller.zoomIn()
-                // Oder zu einer anderen Position springen
-                mapView.controller.setCenter(GeoPoint(48.947410, 9.144216))
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Bewegen und Zoomen")
+                overlays.clear()
+                overlays.add(circle)
+                overlays.add(compassOverlay)
+
+                invalidate()
+            }
         }
-    }
+    )
 }
 
 @Composable
