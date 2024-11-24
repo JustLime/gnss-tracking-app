@@ -17,11 +17,18 @@ import org.osmdroid.util.GeoPoint
 fun MainNavigation(
     navHostController: NavHostController = rememberNavController(),
     currentLocation: GeoPoint,
+    currentPlaceName: String
 ) {
     val mapViewModel = viewModel<MapViewModel>()
 
     NavHost(navController = navHostController, startDestination = Screen.HomeScreen.route) {
-        composable(Screen.HomeScreen.route) { HomeScreen(navHostController, currentLocation) }
+        composable(Screen.HomeScreen.route) {
+            HomeScreen(
+                navHostController,
+                currentLocation,
+                currentPlaceName
+            )
+        }
         composable(Screen.MapScreen.route) { MapScreen(mapViewModel, currentLocation) }
         composable(Screen.StatisticsScreen.route) { StatisticsScreen(navHostController) }
         composable(Screen.SettingsScreen.route) { SettingsScreen(navHostController) }
