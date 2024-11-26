@@ -12,7 +12,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.example.gnsstrackingapp.CHANNEL_ID
 import com.example.gnsstrackingapp.R
-import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -21,6 +20,9 @@ import com.google.android.gms.location.Priority
 import java.util.Locale
 
 class LocationService : Service() {
+    companion object {
+        var onLocationUpdate: ((Double, Double, String) -> Unit)? = null
+    }
 
     private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
         .setWaitForAccurateLocation(false)
@@ -35,15 +37,13 @@ class LocationService : Service() {
 
             latitude?.let { lat ->
                 longitude?.let { lon ->
-                    val locationName =
-                        getLocationName(lat, lon) // Always attempt to resolve location name
+                    val locationName = getLocationName(lat, lon)
                     startForegroundNotification(lat, lon, locationName)
+
+                    // Notify the observer
+                    onLocationUpdate?.invoke(lat, lon, locationName)
                 }
             }
-        }
-
-        override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-            // Handle location availability changes if needed
         }
     }
 
@@ -81,7 +81,6 @@ class LocationService : Service() {
         longitude: Double,
         locationName: String
     ) {
-        // Update the location name only if it's valid
         if (locationName != "Unknown Location") {
             lastKnownLocationName = locationName
         }
@@ -92,7 +91,7 @@ class LocationService : Service() {
             .setContentText("$lastKnownLocationName ($latitude, $longitude)")
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setOngoing(true) // Makes the notification non-dismissible
+            .setOngoing(true)
             .build()
 
         startForeground(1, notification)

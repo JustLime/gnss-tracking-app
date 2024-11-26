@@ -1,26 +1,24 @@
 package com.example.gnsstrackingapp.ui.composables
 
-import android.graphics.Paint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.gnsstrackingapp.R
+import com.example.gnsstrackingapp.ui.map.CircleOverlay
 import com.example.gnsstrackingapp.ui.map.MapViewModel
-import com.example.gnsstrackingapp.ui.theme.Purple40
-import com.example.gnsstrackingapp.ui.theme.Purple80
+import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
@@ -30,40 +28,51 @@ fun OsmMapView(
     modifier: Modifier = Modifier,
     mapView: MapView,
     viewModel: MapViewModel,
-    currentLocation: GeoPoint
+    locationViewModel: LocationViewModel
 ) {
+    val locationData by locationViewModel.locationData.collectAsState()
+
     AndroidView(
         factory = { mapView },
         modifier = modifier.fillMaxSize(),
         update = { mapViewUpdate ->
             mapViewUpdate.apply {
-                setUseDataConnection(true)
-                setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
-                setMultiTouchControls(true)
-                zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+                if (overlays.isEmpty()) {
+                    setUseDataConnection(true)
+                    setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+                    setMultiTouchControls(true)
+                    zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
 
-                viewModel.centerLocation = currentLocation
+                    val compassOverlay = CompassOverlay(context, this)
+                    compassOverlay.enableCompass()
 
-                controller.setZoom(viewModel.zoomLevel)
-                controller.setCenter(viewModel.centerLocation)
+                    val rotationGestureOverlay = RotationGestureOverlay(this)
+                    rotationGestureOverlay.isEnabled = true
 
-                mapView.mapOrientation = viewModel.mapOrientation
+                    overlays.add(compassOverlay)
+                    overlays.add(rotationGestureOverlay)
+                }
 
-                val compassOverlay = CompassOverlay(
-                    this.context, mapView
-                )
-                compassOverlay.enableCompass()
+                mapOrientation = viewModel.mapOrientation
 
-                val rotationGestureOverlay = RotationGestureOverlay(mapView)
-                rotationGestureOverlay.isEnabled = true
+                val existingCircle = mapView.overlays.find { it is CircleOverlay }
+                existingCircle?.let {
+                    mapView.overlays.remove(it)
+                }
 
-                val circle = drawOwnLocationCircle(
-                    viewModel.centerLocation, 3.0, viewModel.zoomLevel
-                )
+                val circleOverlay = CircleOverlay(locationData.location, 0.02f)
+                mapView.overlays.add(circleOverlay)
 
-                overlays.clear()
-                overlays.add(circle)
-                overlays.add(compassOverlay)
+                if (viewModel.centerLocation != locationData.location) {
+                    viewModel.centerLocation = locationData.location
+                    viewModel.zoomLevel = zoomLevelDouble
+
+                    controller.animateTo(
+                        viewModel.centerLocation,
+                        viewModel.zoomLevel,
+                        500
+                    )
+                }
 
                 invalidate()
             }
@@ -103,29 +112,4 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver = rem
             else -> {}
         }
     }
-}
-
-fun drawOwnLocationCircle(
-    geoPoint: GeoPoint, radius: Double = 3.0, zoomFactor: Double = 1.0
-): Polygon {
-    val pointList = mutableListOf<GeoPoint>()
-
-    for (i in 0..360) {
-        pointList.add(
-            GeoPoint(
-                geoPoint.latitude, geoPoint.longitude
-            ).destinationPoint(radius, i.toDouble())
-        )
-    }
-
-    val circle = Polygon()
-    circle.outlinePaint.color = Purple40.toArgb()
-    circle.outlinePaint.strokeWidth = 10.0f
-    circle.outlinePaint.style = Paint.Style.STROKE
-    circle.fillPaint.color = Purple80.toArgb()
-    circle.actualPoints.apply {
-        addAll(pointList)
-    }
-
-    return circle
 }

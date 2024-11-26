@@ -68,6 +68,8 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.play.services.location)
+    implementation(libs.ktor.client.websockets)
+
 
     testImplementation(libs.junit)
 

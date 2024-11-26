@@ -11,13 +11,12 @@ import com.example.gnsstrackingapp.ui.map.MapScreen
 import com.example.gnsstrackingapp.ui.map.MapViewModel
 import com.example.gnsstrackingapp.ui.settings.SettingsScreen
 import com.example.gnsstrackingapp.ui.statistics.StatisticsScreen
-import org.osmdroid.util.GeoPoint
+import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
 
 @Composable
 fun MainNavigation(
     navHostController: NavHostController = rememberNavController(),
-    currentLocation: GeoPoint,
-    currentPlaceName: String
+    locationViewModel: LocationViewModel,
 ) {
     val mapViewModel = viewModel<MapViewModel>()
 
@@ -25,11 +24,10 @@ fun MainNavigation(
         composable(Screen.HomeScreen.route) {
             HomeScreen(
                 navHostController,
-                currentLocation,
-                currentPlaceName
+                locationViewModel
             )
         }
-        composable(Screen.MapScreen.route) { MapScreen(mapViewModel, currentLocation) }
+        composable(Screen.MapScreen.route) { MapScreen(mapViewModel, locationViewModel) }
         composable(Screen.StatisticsScreen.route) { StatisticsScreen(navHostController) }
         composable(Screen.SettingsScreen.route) { SettingsScreen(navHostController) }
     }

@@ -26,12 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gnsstrackingapp.ui.composables.OsmMapView
 import com.example.gnsstrackingapp.ui.composables.rememberMapViewWithLifecycle
-import org.osmdroid.util.GeoPoint
+import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
 
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    currentLocation: GeoPoint
+    locationViewModel: LocationViewModel,
 ) {
     val mapView = rememberMapViewWithLifecycle()
 
@@ -42,7 +42,11 @@ fun MapScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            OsmMapView(mapView = mapView, viewModel = viewModel, currentLocation = currentLocation)
+            OsmMapView(
+                mapView = mapView,
+                viewModel = viewModel,
+                locationViewModel = locationViewModel
+            )
 
             Row(
                 horizontalArrangement = Arrangement.End,
@@ -50,12 +54,12 @@ fun MapScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 GetOwnLocationButton(onClick = {
-                    viewModel.centerLocation = currentLocation
+                    viewModel.centerLocation = locationViewModel.locationData.value.location
                     viewModel.zoomLevel = 20.0
                     viewModel.mapOrientation = 20f
 
                     mapView.controller.animateTo(
-                        currentLocation,
+                        locationViewModel.locationData.value.location,
                         viewModel.zoomLevel,
                         3000L,
                         viewModel.mapOrientation

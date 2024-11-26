@@ -18,6 +18,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -26,10 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.gnsstrackingapp.ui.Screen
-import org.osmdroid.util.GeoPoint
+import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
 
 @Composable
-fun HomeScreen(navController: NavController, currentLocation: GeoPoint, currentPlaceName: String) {
+fun HomeScreen(navController: NavController, locationViewModel: LocationViewModel) {
+    val locationData by locationViewModel.locationData.collectAsState()
+
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = Modifier
@@ -55,19 +59,19 @@ fun HomeScreen(navController: NavController, currentLocation: GeoPoint, currentP
 
                     )
                     Text(
-                        text = currentPlaceName,
+                        text = locationData.locationName,
                         fontSize = 24.sp,
                         modifier = Modifier.padding(16.dp)
                     )
                 }
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        text = "${currentLocation.latitude}° N",
+                        text = "${locationData.location.latitude}° N",
                         fontSize = 20.sp,
                         modifier = Modifier.padding(16.dp)
                     )
                     Text(
-                        text = "${currentLocation.longitude}° O",
+                        text = "${locationData.location.longitude}° O",
                         fontSize = 20.sp,
                         modifier = Modifier.padding(16.dp)
                     )
