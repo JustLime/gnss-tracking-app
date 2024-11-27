@@ -45,7 +45,7 @@ import com.example.gnsstrackingapp.ui.viewmodels.MapViewModel
 
 @Composable
 fun MapScreen(
-    viewModel: MapViewModel,
+    mapViewModel: MapViewModel,
     locationViewModel: LocationViewModel,
 ) {
     val mapView = rememberMapViewWithLifecycle()
@@ -55,7 +55,7 @@ fun MapScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         OsmMapView(
             mapView = mapView,
-            viewModel = viewModel,
+            viewModel = mapViewModel,
             locationViewModel = locationViewModel,
             onCircleClick = { isBottomSheetVisible.value = true }
         )
@@ -68,15 +68,15 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             GetOwnLocationButton(onClick = {
-                viewModel.centerLocation = locationViewModel.locationData.value.location
-                viewModel.zoomLevel = 20.0
-                viewModel.mapOrientation = 20f
+                mapViewModel.centerLocation = locationViewModel.locationData.value.location
+                mapViewModel.zoomLevel = 20.0
+                mapViewModel.mapOrientation = 20f
 
                 mapView.controller.animateTo(
                     locationViewModel.locationData.value.location,
-                    viewModel.zoomLevel,
+                    mapViewModel.zoomLevel,
                     3000L,
-                    viewModel.mapOrientation
+                    mapViewModel.mapOrientation
                 )
             })
         }
@@ -236,4 +236,3 @@ fun getLatitudeDirection(latitude: Double): String {
 fun getLongitudeDirection(longitude: Double): String {
     return if (longitude >= 0) "E" else "W" // East if positive, West if negative
 }
-
