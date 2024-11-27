@@ -1,11 +1,9 @@
 package com.example.gnsstrackingapp.ui.composables
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Settings
@@ -25,24 +23,21 @@ import com.example.gnsstrackingapp.ui.Screen
 @Composable
 fun NavigationBarComponent(navController: NavController) {
     val selectedItem = remember { mutableIntStateOf(0) }
-    val items = listOf("Home", "Map", "Statistics", "Settings")
+    val items = listOf("Map", "Statistics", "Settings")
     val screens =
         listOf(
-            Screen.HomeScreen,
             Screen.MapScreen,
             Screen.StatisticsScreen,
             Screen.SettingsScreen
         )
     val selectedIcons =
         listOf(
-            Icons.Filled.Home,
             Icons.Filled.LocationOn,
             Icons.Filled.Info,
             Icons.Filled.Settings
         )
     val unselectedIcons =
         listOf(
-            Icons.Outlined.Home,
             Icons.Outlined.LocationOn,
             Icons.Outlined.Info,
             Icons.Outlined.Settings

@@ -2,6 +2,7 @@ package com.example.gnsstrackingapp.ui.map
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.view.MotionEvent
 import androidx.compose.ui.graphics.toArgb
 import com.example.gnsstrackingapp.ui.theme.Purple40
 import com.example.gnsstrackingapp.ui.theme.Purple80
@@ -9,23 +10,16 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Overlay
 
-/**
- * An overlay that draws a circle at a given [GeoPoint] with a size relative to the screen size.
- *
- * The size is specified as a fraction of the screen size, e.g. 0.05 for 5% of the screen size.
- *
- * @param center The center of the circle.
- * @param fractionOfScreen The fraction of the screen size of the circle.
- */
 class CircleOverlay(
     private val center: GeoPoint,
-    private val fractionOfScreen: Float, // Fraction of screen size (e.g., 0.05 for 5%)
+    private val fractionOfScreen: Float,
+    private val accuracyInMeters: Float,
+    private val onClick: () -> Unit
 ) : Overlay() {
-    private val fillColor: Int =
-        Purple80.copy(alpha = 0.7f).toArgb()
-    private val strokeColor: Int =
-        Purple40.toArgb()
-    private val strokeWidthCircle: Float = 5f // Default stroke width
+
+    private val fillColor: Int = Purple80.copy(alpha = 0.7f).toArgb()
+    private val strokeColor: Int = Purple40.toArgb()
+    private val strokeWidthCircle: Float = 5f
 
     private val paint = Paint().apply {
         color = fillColor
@@ -41,34 +35,57 @@ class CircleOverlay(
         isAntiAlias = true
     }
 
+    private val accuracyPaint = Paint().apply {
+        color = Purple40.copy(alpha = 0.3f).toArgb()
+        strokeWidth = strokeWidthCircle
+        style = Paint.Style.FILL_AND_STROKE
+        isAntiAlias = true
+    }
+
     override fun draw(canvas: Canvas, mapView: MapView, shadow: Boolean) {
         super.draw(canvas, mapView, shadow)
 
-        // Get screen resolution (width and height of the map view)
         val screenWidth = mapView.width
-
-        // Calculate the radius of the circle as a fraction of the screen width (or height)
-        val radiusInPixels =
-            (screenWidth * fractionOfScreen).toInt() // Use screen width for the radius calculation
-
-        // Convert GeoPoint (lat, lon) to screen coordinates
+        val radiusInPixels = (screenWidth * fractionOfScreen).toInt()
         val projection = mapView.projection
         val screenPoint = projection.toPixels(center, null)
+        val accuracyRadiusInPixels =
+            mapView.projection.metersToPixels(accuracyInMeters)
 
-        // Draw the circle fill
+        canvas.drawCircle(
+            screenPoint.x.toFloat(),
+            screenPoint.y.toFloat(),
+            accuracyRadiusInPixels,
+            accuracyPaint
+        )
+
         canvas.drawCircle(
             screenPoint.x.toFloat(),
             screenPoint.y.toFloat(),
             radiusInPixels.toFloat(),
-            paint // Fill color
+            paint
         )
 
-        // Draw the circle stroke (outline)
         canvas.drawCircle(
             screenPoint.x.toFloat(),
             screenPoint.y.toFloat(),
             radiusInPixels.toFloat(),
-            strokePaint // Stroke color
+            strokePaint
         )
+    }
+
+    override fun onSingleTapConfirmed(event: MotionEvent, mapView: MapView): Boolean {
+        val projection = mapView.projection
+        val screenPoint = projection.toPixels(center, null)
+        val radiusInPixels = (mapView.width * fractionOfScreen).toInt()
+        val dx = event.x - screenPoint.x
+        val dy = event.y - screenPoint.y
+
+        if (dx * dx + dy * dy <= radiusInPixels * radiusInPixels) {
+            onClick()
+            return true
+        }
+
+        return false
     }
 }

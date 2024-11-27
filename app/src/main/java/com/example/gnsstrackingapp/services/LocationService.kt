@@ -21,27 +21,27 @@ import java.util.Locale
 
 class LocationService : Service() {
     companion object {
-        var onLocationUpdate: ((Double, Double, String) -> Unit)? = null
+        var onLocationUpdate: ((Double, Double, String, Float) -> Unit)? = null
     }
 
     private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
         .setWaitForAccurateLocation(false)
-        .setMinUpdateIntervalMillis(1000)
-        .setMaxUpdateDelayMillis(1000)
+        .setIntervalMillis(3000)
         .build()
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             val latitude = locationResult.lastLocation?.latitude
             val longitude = locationResult.lastLocation?.longitude
+            val accuracy = locationResult.lastLocation?.accuracy ?: 0f
 
             latitude?.let { lat ->
                 longitude?.let { lon ->
                     val locationName = getLocationName(lat, lon)
-                    startForegroundNotification(lat, lon, locationName)
+                    startForegroundNotification(lat, lon, locationName, accuracy)
 
                     // Notify the observer
-                    onLocationUpdate?.invoke(lat, lon, locationName)
+                    onLocationUpdate?.invoke(lat, lon, locationName, accuracy)
                 }
             }
         }
@@ -79,7 +79,8 @@ class LocationService : Service() {
     private fun startForegroundNotification(
         latitude: Double,
         longitude: Double,
-        locationName: String
+        locationName: String,
+        accuracy: Float = 0f
     ) {
         if (locationName != "Unknown Location") {
             lastKnownLocationName = locationName
@@ -88,7 +89,7 @@ class LocationService : Service() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Tracking Location")
-            .setContentText("$lastKnownLocationName ($latitude, $longitude)")
+            .setContentText("$lastKnownLocationName ($latitude, $longitude) - Accuracy: $accuracy m")
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setOngoing(true)

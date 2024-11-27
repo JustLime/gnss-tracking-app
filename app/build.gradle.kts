@@ -68,7 +68,21 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.play.services.location)
-    implementation(libs.ktor.client.websockets)
+
+    // Ktor
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.serialization.jvm)
+    implementation(libs.ktor.client.logging)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    // Coroutines - Deferred adapter
+    implementation(libs.retrofit2.kotlin.coroutines.adapter)
+
+    // Dependency Injection
+    implementation(libs.koin.android)
 
 
     testImplementation(libs.junit)

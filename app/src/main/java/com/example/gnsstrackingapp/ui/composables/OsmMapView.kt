@@ -6,6 +6,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -14,11 +15,13 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.gnsstrackingapp.R
 import com.example.gnsstrackingapp.ui.map.CircleOverlay
-import com.example.gnsstrackingapp.ui.map.MapViewModel
 import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
+import com.example.gnsstrackingapp.ui.viewmodels.MapViewModel
+import kotlinx.coroutines.launch
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
@@ -28,9 +31,11 @@ fun OsmMapView(
     modifier: Modifier = Modifier,
     mapView: MapView,
     viewModel: MapViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    onCircleClick: () -> Unit // Callback to show the bottom composable
 ) {
     val locationData by locationViewModel.locationData.collectAsState()
+    val scope = rememberCoroutineScope()
 
     AndroidView(
         factory = { mapView },
@@ -39,7 +44,7 @@ fun OsmMapView(
             mapViewUpdate.apply {
                 if (overlays.isEmpty()) {
                     setUseDataConnection(true)
-                    setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+                    setTileSource(TileSourceFactory.MAPNIK)
                     setMultiTouchControls(true)
                     zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
 
@@ -49,29 +54,43 @@ fun OsmMapView(
                     val rotationGestureOverlay = RotationGestureOverlay(this)
                     rotationGestureOverlay.isEnabled = true
 
-                    overlays.add(compassOverlay)
+                    val scaleOverlay = ScaleBarOverlay(this)
+                    scaleOverlay.setCentred(true)
+                    scaleOverlay.setScaleBarOffset(300, 50)
+
+//                    overlays.add(compassOverlay)
                     overlays.add(rotationGestureOverlay)
+                    overlays.add(scaleOverlay)
                 }
 
                 mapOrientation = viewModel.mapOrientation
+                controller.setZoom(viewModel.zoomLevel)
 
                 val existingCircle = mapView.overlays.find { it is CircleOverlay }
                 existingCircle?.let {
                     mapView.overlays.remove(it)
                 }
 
-                val circleOverlay = CircleOverlay(locationData.location, 0.02f)
+                val accuracyInMeters = locationData.accuracy
+                val circleOverlay = CircleOverlay(
+                    locationData.location,
+                    0.03f,
+                    accuracyInMeters,
+                    onCircleClick,
+                )
                 mapView.overlays.add(circleOverlay)
 
                 if (viewModel.centerLocation != locationData.location) {
-                    viewModel.centerLocation = locationData.location
-                    viewModel.zoomLevel = zoomLevelDouble
+                    scope.launch {
+                        viewModel.centerLocation = locationData.location
+                        viewModel.zoomLevel = zoomLevelDouble
 
-                    controller.animateTo(
-                        viewModel.centerLocation,
-                        viewModel.zoomLevel,
-                        500
-                    )
+                        controller.animateTo(
+                            viewModel.centerLocation,
+                            viewModel.zoomLevel,
+                            1000
+                        )
+                    }
                 }
 
                 invalidate()

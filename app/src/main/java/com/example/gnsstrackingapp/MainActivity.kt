@@ -1,6 +1,5 @@
 package com.example.gnsstrackingapp
 
-import android.content.BroadcastReceiver
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -24,10 +23,8 @@ import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
 import org.osmdroid.util.GeoPoint
 
 class MainActivity : ComponentActivity() {
-    private lateinit var locationReceiver: BroadcastReceiver
     private lateinit var serviceManager: ServiceManager
     private val locationViewModel: LocationViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,15 +47,13 @@ class MainActivity : ComponentActivity() {
             serviceManager.startLocationService()
         }
 
-        LocationService.onLocationUpdate = { latitude, longitude, locationName ->
-            locationViewModel.updateLocation(GeoPoint(latitude, longitude), locationName)
+        LocationService.onLocationUpdate = { latitude, longitude, locationName, accuracy ->
+            locationViewModel.updateLocation(GeoPoint(latitude, longitude), locationName, accuracy)
         }
 
         setContent {
             GNSSTrackingAppTheme {
                 val navHostController = rememberNavController()
-                val currentPlaceName = "Bietigheim-Bissingen"
-                val currentLocation = GeoPoint(48.947410, 9.144216)
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),

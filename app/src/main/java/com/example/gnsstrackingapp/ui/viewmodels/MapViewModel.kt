@@ -1,4 +1,4 @@
-package com.example.gnsstrackingapp.ui.map
+package com.example.gnsstrackingapp.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import org.osmdroid.util.GeoPoint
