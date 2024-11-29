@@ -34,6 +34,8 @@ class MainActivity : ComponentActivity() {
 
         serviceManager = ServiceManager(this)
 
+        // Setup OsmDroid user agent because the default is "osmdroid" which is banned
+        // and will cause OsmDroid to crash or not loading maps
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         val requestPermissionLauncher =
