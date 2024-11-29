@@ -20,23 +20,21 @@ import com.example.gnsstrackingapp.ui.MainNavigation
 import com.example.gnsstrackingapp.ui.composables.NavigationBarComponent
 import com.example.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
 import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
-import org.osmdroid.mapsforge.MapsForgeTileProvider
-import org.osmdroid.mapsforge.MapsForgeTileSource
+import org.osmdroid.config.Configuration
+import org.osmdroid.library.BuildConfig
 import org.osmdroid.util.GeoPoint
 
 
 class MainActivity : ComponentActivity() {
     private lateinit var serviceManager: ServiceManager
     private val locationViewModel: LocationViewModel by viewModels()
-    var fromFiles: MapsForgeTileSource? = null
-    var forge: MapsForgeTileProvider? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         serviceManager = ServiceManager(this)
 
-        MapsForgeTileSource.createInstance(this.application)
+        Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
