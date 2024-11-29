@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.gnsstrackingapp"
+    namespace = "de.hhn.gnsstrackingapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.gnsstrackingapp"
+        applicationId = "de.hhn.gnsstrackingapp"
         minSdk = 30
         targetSdk = 35
         versionCode = 1

@@ -12,7 +12,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.example.gnsstrackingapp.R
+import de.hhn.gnsstrackingapp.R
 import de.hhn.gnsstrackingapp.ui.viewmodels.LocationViewModel
 import de.hhn.gnsstrackingapp.ui.viewmodels.MapViewModel
 import org.osmdroid.events.MapListener
@@ -38,7 +38,12 @@ fun OsmMapView(
 
     val mapListener = object : MapListener {
         override fun onScroll(event: ScrollEvent?): Boolean {
-            return false
+            event?.let {
+                val currentMapOrientation = it.source.mapOrientation
+                viewModel.mapOrientation = currentMapOrientation
+            }
+
+            return true
         }
 
         override fun onZoom(event: ZoomEvent?): Boolean {

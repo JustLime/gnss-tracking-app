@@ -68,13 +68,12 @@ fun MapScreen(
             GetOwnLocationButton(onClick = {
                 mapViewModel.centerLocation = locationViewModel.locationData.value.location
                 mapViewModel.zoomLevel = 20.0
-                mapViewModel.mapOrientation = 20f
 
                 mapView.controller.animateTo(
                     locationViewModel.locationData.value.location,
                     mapViewModel.zoomLevel,
                     3000L,
-                    mapViewModel.mapOrientation
+                    0f
                 )
             })
         }
