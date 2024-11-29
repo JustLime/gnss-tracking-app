@@ -1,6 +1,7 @@
 package com.example.gnsstrackingapp.services
 
 import android.Manifest
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,6 +12,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.example.gnsstrackingapp.CHANNEL_ID
+import com.example.gnsstrackingapp.MainActivity
 import com.example.gnsstrackingapp.R
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -86,12 +88,23 @@ class LocationService : Service() {
             lastKnownLocationName = locationName
         }
 
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Tracking Location")
             .setContentText("$lastKnownLocationName ($latitude, $longitude) - Accuracy: $accuracy m")
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setContentIntent(pendingIntent)
             .setOngoing(true)
             .build()
 
