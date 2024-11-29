@@ -113,19 +113,38 @@ class LocationService : Service() {
 
     private fun getLocationName(latitude: Double, longitude: Double): String {
         val geocoder = Geocoder(this, Locale.getDefault())
-        return try {
-            // TODO: Get alternative for Geocoder deprecated methods
-            val addresses: MutableList<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
-            if (addresses?.isNotEmpty() == true) {
-                addresses[0].locality ?: "Unknown Location" // City name or fallback
-            } else {
-                "Unknown Location"
+        var locationName = "Unknown Location"
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            geocoder.getFromLocation(latitude, longitude, 1, object : Geocoder.GeocodeListener {
+                override fun onGeocode(addresses: MutableList<Address>) {
+                    if (addresses.isNotEmpty()) {
+                        locationName =
+                            addresses[0].locality ?: "Unknown Location" // City name or fallback
+                    }
+                }
+
+                override fun onError(errorMessage: String?) {
+                    Log.e("LocationService", "Geocode error: $errorMessage")
+                }
+            })
+        } else {
+            try {
+                @Suppress("DEPRECATION")
+                val addresses: MutableList<Address>? =
+                    geocoder.getFromLocation(latitude, longitude, 1)
+                if (addresses?.isNotEmpty() == true) {
+                    locationName =
+                        addresses[0].locality ?: "Unknown Location" // City name or fallback
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            "Unknown Location"
         }
+
+        return locationName
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
