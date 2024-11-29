@@ -1,4 +1,4 @@
-package com.example.gnsstrackingapp.data
+package com.example.gnsstrackingapp.network
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

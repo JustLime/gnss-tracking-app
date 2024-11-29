@@ -20,16 +20,23 @@ import com.example.gnsstrackingapp.ui.MainNavigation
 import com.example.gnsstrackingapp.ui.composables.NavigationBarComponent
 import com.example.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
 import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
+import org.osmdroid.mapsforge.MapsForgeTileProvider
+import org.osmdroid.mapsforge.MapsForgeTileSource
 import org.osmdroid.util.GeoPoint
+
 
 class MainActivity : ComponentActivity() {
     private lateinit var serviceManager: ServiceManager
     private val locationViewModel: LocationViewModel by viewModels()
+    var fromFiles: MapsForgeTileSource? = null
+    var forge: MapsForgeTileProvider? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         serviceManager = ServiceManager(this)
+
+        MapsForgeTileSource.createInstance(this.application)
 
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -56,22 +63,17 @@ class MainActivity : ComponentActivity() {
                 val navHostController = rememberNavController()
 
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    Scaffold(
-                        bottomBar = {
-                            NavigationBarComponent(navController = navHostController)
-                        },
-                        content = { padding ->
-                            Column(Modifier.padding(padding)) {
-                                MainNavigation(
-                                    navHostController,
-                                    locationViewModel
-                                )
-                            }
+                    Scaffold(bottomBar = {
+                        NavigationBarComponent(navController = navHostController)
+                    }, content = { padding ->
+                        Column(Modifier.padding(padding)) {
+                            MainNavigation(
+                                navHostController, locationViewModel
+                            )
                         }
-                    )
+                    })
                 }
             }
         }

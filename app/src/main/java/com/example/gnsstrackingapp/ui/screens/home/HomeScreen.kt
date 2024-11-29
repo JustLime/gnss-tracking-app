@@ -1,4 +1,4 @@
-package com.example.gnsstrackingapp.ui.home
+package com.example.gnsstrackingapp.ui.screens.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

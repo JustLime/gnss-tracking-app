@@ -1,4 +1,4 @@
-package com.example.gnsstrackingapp.ui.composables
+package com.example.gnsstrackingapp.ui.screens.map
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -6,7 +6,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -14,10 +13,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.gnsstrackingapp.R
-import com.example.gnsstrackingapp.ui.map.CircleOverlay
 import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
 import com.example.gnsstrackingapp.ui.viewmodels.MapViewModel
-import kotlinx.coroutines.launch
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -32,10 +32,25 @@ fun OsmMapView(
     mapView: MapView,
     viewModel: MapViewModel,
     locationViewModel: LocationViewModel,
-    onCircleClick: () -> Unit // Callback to show the bottom composable
+    onCircleClick: () -> Unit
 ) {
     val locationData by locationViewModel.locationData.collectAsState()
-    val scope = rememberCoroutineScope()
+
+    val mapListener = object : MapListener {
+        override fun onScroll(event: ScrollEvent?): Boolean {
+            return false
+        }
+
+        override fun onZoom(event: ZoomEvent?): Boolean {
+            event?.let {
+                val currentZoomLevel = it.source.zoomLevelDouble
+                viewModel.zoomLevel = currentZoomLevel
+            }
+
+            return true
+        }
+
+    }
 
     AndroidView(
         factory = { mapView },
@@ -63,6 +78,10 @@ fun OsmMapView(
                     overlays.add(scaleOverlay)
                 }
 
+                if (!hasMapListener(mapListener)) {
+                    addMapListener(mapListener)
+                }
+
                 mapOrientation = viewModel.mapOrientation
                 controller.setZoom(viewModel.zoomLevel)
 
@@ -81,16 +100,13 @@ fun OsmMapView(
                 mapView.overlays.add(circleOverlay)
 
                 if (viewModel.centerLocation != locationData.location) {
-                    scope.launch {
-                        viewModel.centerLocation = locationData.location
-                        viewModel.zoomLevel = zoomLevelDouble
+                    viewModel.centerLocation = locationData.location
 
-                        controller.animateTo(
-                            viewModel.centerLocation,
-                            viewModel.zoomLevel,
-                            1000
-                        )
-                    }
+                    controller.animateTo(
+                        viewModel.centerLocation,
+                        viewModel.zoomLevel,
+                        500
+                    )
                 }
 
                 invalidate()
@@ -131,4 +147,8 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver = rem
             else -> {}
         }
     }
+}
+
+private fun MapView.hasMapListener(listener: MapListener): Boolean {
+    return overlays.any { it == listener }
 }

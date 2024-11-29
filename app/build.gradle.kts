@@ -63,10 +63,16 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    // Added third party libraries
-    implementation(libs.osmdroid.android)
+    // Jetpack Compose components
     implementation(libs.androidx.preference.ktx)
     implementation(libs.androidx.navigation.compose)
+
+    // OsmDroid
+    implementation(libs.osmdroid.android)
+    implementation(libs.osmdroid.mapsforge)
+
+
+    // Google Play Services Location
     implementation(libs.play.services.location)
 
     // Ktor

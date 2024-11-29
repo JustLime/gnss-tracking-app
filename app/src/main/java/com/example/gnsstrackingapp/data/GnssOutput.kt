@@ -1,4 +1,4 @@
-package com.example.gnsstrackingapp.ui.data
+package com.example.gnsstrackingapp.data
 
 // {
 // "time": "161931.00",

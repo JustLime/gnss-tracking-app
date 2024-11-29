@@ -6,9 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.gnsstrackingapp.ui.map.MapScreen
-import com.example.gnsstrackingapp.ui.settings.SettingsScreen
-import com.example.gnsstrackingapp.ui.statistics.StatisticsScreen
+import com.example.gnsstrackingapp.ui.screens.map.MapScreen
+import com.example.gnsstrackingapp.ui.screens.settings.SettingsScreen
+import com.example.gnsstrackingapp.ui.screens.statistics.StatisticsScreen
 import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
 import com.example.gnsstrackingapp.ui.viewmodels.MapViewModel
 

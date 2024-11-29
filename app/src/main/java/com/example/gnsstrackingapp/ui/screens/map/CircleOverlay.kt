@@ -1,4 +1,4 @@
-package com.example.gnsstrackingapp.ui.map
+package com.example.gnsstrackingapp.ui.screens.map
 
 import android.graphics.Canvas
 import android.graphics.Paint

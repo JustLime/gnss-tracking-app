@@ -1,4 +1,4 @@
-package com.example.gnsstrackingapp.ui.statistics
+package com.example.gnsstrackingapp.ui.screens.statistics
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,8 +19,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.gnsstrackingapp.data.GnssClient
-import com.example.gnsstrackingapp.ui.data.GnssOutput
+import com.example.gnsstrackingapp.data.GnssOutput
+import com.example.gnsstrackingapp.network.GnssClient
 import kotlinx.coroutines.launch
 
 @Composable

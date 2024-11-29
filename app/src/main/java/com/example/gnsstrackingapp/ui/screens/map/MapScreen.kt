@@ -1,4 +1,4 @@
-package com.example.gnsstrackingapp.ui.map
+package com.example.gnsstrackingapp.ui.screens.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.gnsstrackingapp.ui.composables.OsmMapView
-import com.example.gnsstrackingapp.ui.composables.rememberMapViewWithLifecycle
 import com.example.gnsstrackingapp.ui.viewmodels.LocationData
 import com.example.gnsstrackingapp.ui.viewmodels.LocationViewModel
 import com.example.gnsstrackingapp.ui.viewmodels.MapViewModel
