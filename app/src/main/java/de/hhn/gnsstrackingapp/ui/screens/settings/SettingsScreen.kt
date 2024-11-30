@@ -24,10 +24,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(settingsViewModel: SettingsViewModel) {
     val isChecked = remember { mutableStateOf(false) }
     val typography = Typography()
 

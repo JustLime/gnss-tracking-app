@@ -79,6 +79,8 @@ dependencies {
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.serialization.jvm)
     implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.websockets)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
@@ -88,6 +90,9 @@ dependencies {
 
     // Dependency Injection
     implementation(libs.koin.android)
+
+    // Gson for JSON serialization
+    implementation(libs.gson)
 
 
     testImplementation(libs.junit)

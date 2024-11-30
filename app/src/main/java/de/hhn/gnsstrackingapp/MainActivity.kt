@@ -13,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import de.hhn.gnsstrackingapp.network.WebServicesProvider
 import de.hhn.gnsstrackingapp.services.LocationService
 import de.hhn.gnsstrackingapp.services.ServiceManager
 import de.hhn.gnsstrackingapp.ui.composables.NavigationBarComponent
@@ -30,7 +31,8 @@ import org.osmdroid.util.GeoPoint
 
 class MainActivity : ComponentActivity() {
     private lateinit var serviceManager: ServiceManager
-    
+    private lateinit var webServicesProvider: WebServicesProvider
+
     private val mapViewModel: MapViewModel by viewModel()
     private val locationViewModel: LocationViewModel by viewModel()
     private val settingsViewModel: SettingsViewModel by viewModel()
@@ -94,6 +96,7 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
 
         serviceManager.stopLocationService()
+        webServicesProvider.stopSocket()
     }
 }
 

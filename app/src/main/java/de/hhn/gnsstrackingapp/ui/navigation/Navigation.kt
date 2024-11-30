@@ -23,7 +23,7 @@ fun MainNavigation(
 ) {
     NavHost(navController = navHostController, startDestination = Screen.MapScreen.route) {
         composable(Screen.MapScreen.route) { MapScreen(mapViewModel, locationViewModel) }
-        composable(Screen.StatisticsScreen.route) { StatisticsScreen() }
-        composable(Screen.SettingsScreen.route) { SettingsScreen(navHostController) }
+        composable(Screen.StatisticsScreen.route) { StatisticsScreen(statisticsViewModel) }
+        composable(Screen.SettingsScreen.route) { SettingsScreen(settingsViewModel) }
     }
 }
