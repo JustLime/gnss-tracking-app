@@ -8,8 +8,8 @@ import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
 data class LocationData(
-    val location: GeoPoint = GeoPoint(0.0, 0.0),
-    val locationName: String = "Unknown Location",
+    val location: GeoPoint = GeoPoint(49.122666, 9.209987),
+    val locationName: String = "Heilbronn",
     val accuracy: Float = 0.0f
 )
 

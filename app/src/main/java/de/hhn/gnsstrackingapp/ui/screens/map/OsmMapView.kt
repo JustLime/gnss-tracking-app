@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import de.hhn.gnsstrackingapp.R
+import de.hhn.gnsstrackingapp.ui.viewmodels.LocationData
 import de.hhn.gnsstrackingapp.ui.viewmodels.LocationViewModel
 import de.hhn.gnsstrackingapp.ui.viewmodels.MapViewModel
 import org.osmdroid.events.MapListener
@@ -36,11 +37,17 @@ fun OsmMapView(
 ) {
     val locationData by locationViewModel.locationData.collectAsState()
 
+    DisposableEffect(mapView) {
+        initializeMapView(mapView, viewModel)
+        onDispose {
+            mapView.overlays.removeIf { it is CircleOverlay }
+        }
+    }
+
     val mapListener = object : MapListener {
         override fun onScroll(event: ScrollEvent?): Boolean {
             event?.let {
-                val currentMapOrientation = it.source.mapOrientation
-                viewModel.mapOrientation = currentMapOrientation
+                viewModel.mapOrientation = it.source.mapOrientation
             }
 
             return true
@@ -48,8 +55,7 @@ fun OsmMapView(
 
         override fun onZoom(event: ZoomEvent?): Boolean {
             event?.let {
-                val currentZoomLevel = it.source.zoomLevelDouble
-                viewModel.zoomLevel = currentZoomLevel
+                viewModel.zoomLevel = it.source.zoomLevelDouble
             }
 
             return true
@@ -62,57 +68,11 @@ fun OsmMapView(
         modifier = modifier.fillMaxSize(),
         update = { mapViewUpdate ->
             mapViewUpdate.apply {
-                if (overlays.isEmpty()) {
-                    setUseDataConnection(true)
-                    setTileSource(TileSourceFactory.MAPNIK)
-                    setMultiTouchControls(true)
-                    zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-
-                    val compassOverlay = CompassOverlay(context, this)
-                    compassOverlay.enableCompass()
-
-                    val rotationGestureOverlay = RotationGestureOverlay(this)
-                    rotationGestureOverlay.isEnabled = true
-
-                    val scaleOverlay = ScaleBarOverlay(this)
-                    scaleOverlay.setCentred(true)
-                    scaleOverlay.setScaleBarOffset(300, 50)
-
-//                    overlays.add(compassOverlay)
-                    overlays.add(rotationGestureOverlay)
-                    overlays.add(scaleOverlay)
-                }
-
                 if (!hasMapListener(mapListener)) {
                     addMapListener(mapListener)
                 }
 
-                mapOrientation = viewModel.mapOrientation
-                controller.setZoom(viewModel.zoomLevel)
-
-                val existingCircle = mapView.overlays.find { it is CircleOverlay }
-                existingCircle?.let {
-                    mapView.overlays.remove(it)
-                }
-
-                val accuracyInMeters = locationData.accuracy
-                val circleOverlay = CircleOverlay(
-                    locationData.location,
-                    0.03f,
-                    accuracyInMeters,
-                    onCircleClick,
-                )
-                mapView.overlays.add(circleOverlay)
-
-                if (viewModel.centerLocation != locationData.location) {
-                    viewModel.centerLocation = locationData.location
-
-                    controller.animateTo(
-                        viewModel.centerLocation,
-                        viewModel.zoomLevel,
-                        500
-                    )
-                }
+                updateMapViewState(mapView, viewModel, locationData, onCircleClick)
 
                 invalidate()
             }
@@ -156,4 +116,54 @@ fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver = rem
 
 private fun MapView.hasMapListener(listener: MapListener): Boolean {
     return overlays.any { it == listener }
+}
+
+private fun initializeMapView(mapView: MapView, viewModel: MapViewModel) {
+    mapView.apply {
+        setUseDataConnection(true)
+        setTileSource(TileSourceFactory.MAPNIK)
+        setMultiTouchControls(true)
+        zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+
+        val rotationGestureOverlay = RotationGestureOverlay(this).apply { isEnabled = true }
+        val scaleOverlay = ScaleBarOverlay(this).apply {
+            setCentred(true)
+            setScaleBarOffset(300, 50)
+        }
+        val compassOverlay = CompassOverlay(context, this).apply {
+            enableCompass()
+        }
+
+        overlays.add(rotationGestureOverlay)
+        overlays.add(scaleOverlay)
+//        overlays.add(compassOverlay)
+    }
+}
+
+private fun updateMapViewState(
+    mapView: MapView,
+    viewModel: MapViewModel,
+    locationData: LocationData,
+    onCircleClick: () -> Unit
+) {
+    mapView.mapOrientation = viewModel.mapOrientation
+    mapView.controller.setZoom(viewModel.zoomLevel)
+
+    val existingCircle = mapView.overlays.find { it is CircleOverlay }
+    if (existingCircle != null) {
+        mapView.overlays.remove(existingCircle)
+    }
+
+    val circleOverlay = CircleOverlay(
+        locationData.location,
+        0.03f,
+        locationData.accuracy,
+        onCircleClick
+    )
+    mapView.overlays.add(circleOverlay)
+
+    if (viewModel.centerLocation != locationData.location) {
+        viewModel.centerLocation = locationData.location
+        mapView.controller.animateTo(viewModel.centerLocation, viewModel.zoomLevel, 500)
+    }
 }

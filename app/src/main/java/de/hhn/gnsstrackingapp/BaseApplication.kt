@@ -16,7 +16,12 @@ class BaseApplication : Application() {
             CHANNEL_ID,
             CHANNEL_NAME,
             NotificationManager.IMPORTANCE_DEFAULT
-        )
+        ).apply {
+            description = "Channel for location tracking notifications"
+            setSound(null, null)
+            enableVibration(false)
+        }
+
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

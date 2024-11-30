@@ -46,7 +46,7 @@ class LocationService : Service() {
             }
         }
     }
-    
+
 
     private var lastKnownLocationName: String = "Unknown Location"
 
@@ -83,21 +83,25 @@ class LocationService : Service() {
         }
 
         val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground).setContentTitle("Tracking Location")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Tracking Location")
             .setContentText("$lastKnownLocationName ($latitude, $longitude) - Accuracy: $accuracy m")
             .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE).setContentIntent(pendingIntent)
-            .setOngoing(true).build()
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setContentIntent(pendingIntent)
+            .setOngoing(true)
+            .build()
 
         startForeground(1, notification)
     }
+
 
     private fun getLocationName(latitude: Double, longitude: Double, callback: (String) -> Unit) {
         val geocoder = Geocoder(this, Locale.getDefault())
