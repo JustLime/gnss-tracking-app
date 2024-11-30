@@ -18,7 +18,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
-import de.hhn.gnsstrackingapp.ui.Screen
+import de.hhn.gnsstrackingapp.ui.navigation.Screen
 
 @Composable
 fun NavigationBarComponent(navController: NavController) {

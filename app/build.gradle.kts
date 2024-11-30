@@ -71,7 +71,6 @@ dependencies {
     implementation(libs.osmdroid.android)
     implementation(libs.osmdroid.mapsforge)
 
-
     // Google Play Services Location
     implementation(libs.play.services.location)
 

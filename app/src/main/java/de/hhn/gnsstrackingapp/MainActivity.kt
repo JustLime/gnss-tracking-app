@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,10 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import de.hhn.gnsstrackingapp.services.LocationService
 import de.hhn.gnsstrackingapp.services.ServiceManager
-import de.hhn.gnsstrackingapp.ui.MainNavigation
 import de.hhn.gnsstrackingapp.ui.composables.NavigationBarComponent
+import de.hhn.gnsstrackingapp.ui.navigation.MainNavigation
+import de.hhn.gnsstrackingapp.ui.screens.map.LocationViewModel
+import de.hhn.gnsstrackingapp.ui.screens.map.MapViewModel
+import de.hhn.gnsstrackingapp.ui.screens.settings.SettingsViewModel
+import de.hhn.gnsstrackingapp.ui.screens.statistics.StatisticsViewModel
 import de.hhn.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
-import de.hhn.gnsstrackingapp.ui.viewmodels.LocationViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
 import org.osmdroid.util.GeoPoint
@@ -27,7 +30,11 @@ import org.osmdroid.util.GeoPoint
 
 class MainActivity : ComponentActivity() {
     private lateinit var serviceManager: ServiceManager
-    private val locationViewModel: LocationViewModel by viewModels()
+    
+    private val mapViewModel: MapViewModel by viewModel()
+    private val locationViewModel: LocationViewModel by viewModel()
+    private val settingsViewModel: SettingsViewModel by viewModel()
+    private val statisticsViewModel: StatisticsViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +77,11 @@ class MainActivity : ComponentActivity() {
                     }, content = { padding ->
                         Column(Modifier.padding(padding)) {
                             MainNavigation(
-                                navHostController, locationViewModel
+                                navHostController,
+                                mapViewModel,
+                                locationViewModel,
+                                statisticsViewModel,
+                                settingsViewModel
                             )
                         }
                     })

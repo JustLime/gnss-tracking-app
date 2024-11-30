@@ -37,9 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import de.hhn.gnsstrackingapp.ui.viewmodels.LocationData
-import de.hhn.gnsstrackingapp.ui.viewmodels.LocationViewModel
-import de.hhn.gnsstrackingapp.ui.viewmodels.MapViewModel
 
 @Composable
 fun MapScreen(
@@ -53,7 +50,7 @@ fun MapScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         OsmMapView(
             mapView = mapView,
-            viewModel = mapViewModel,
+            mapViewModel = mapViewModel,
             locationViewModel = locationViewModel,
             onCircleClick = { isBottomSheetVisible.value = true }
         )

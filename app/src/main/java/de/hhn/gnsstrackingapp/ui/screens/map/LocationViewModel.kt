@@ -1,4 +1,4 @@
-package de.hhn.gnsstrackingapp.ui.viewmodels
+package de.hhn.gnsstrackingapp.ui.screens.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +14,6 @@ data class LocationData(
 )
 
 class LocationViewModel : ViewModel() {
-
     private val _locationData = MutableStateFlow(LocationData())
     val locationData: StateFlow<LocationData> = _locationData
 

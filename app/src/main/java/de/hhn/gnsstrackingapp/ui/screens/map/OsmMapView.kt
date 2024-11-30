@@ -13,9 +13,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import de.hhn.gnsstrackingapp.R
-import de.hhn.gnsstrackingapp.ui.viewmodels.LocationData
-import de.hhn.gnsstrackingapp.ui.viewmodels.LocationViewModel
-import de.hhn.gnsstrackingapp.ui.viewmodels.MapViewModel
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
@@ -31,14 +28,14 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 fun OsmMapView(
     modifier: Modifier = Modifier,
     mapView: MapView,
-    viewModel: MapViewModel,
+    mapViewModel: MapViewModel,
     locationViewModel: LocationViewModel,
     onCircleClick: () -> Unit
 ) {
     val locationData by locationViewModel.locationData.collectAsState()
 
     DisposableEffect(mapView) {
-        initializeMapView(mapView, viewModel)
+        initializeMapView(mapView, mapViewModel)
         onDispose {
             mapView.overlays.removeIf { it is CircleOverlay }
         }
@@ -47,7 +44,7 @@ fun OsmMapView(
     val mapListener = object : MapListener {
         override fun onScroll(event: ScrollEvent?): Boolean {
             event?.let {
-                viewModel.mapOrientation = it.source.mapOrientation
+                mapViewModel.mapOrientation = it.source.mapOrientation
             }
 
             return true
@@ -55,7 +52,7 @@ fun OsmMapView(
 
         override fun onZoom(event: ZoomEvent?): Boolean {
             event?.let {
-                viewModel.zoomLevel = it.source.zoomLevelDouble
+                mapViewModel.zoomLevel = it.source.zoomLevelDouble
             }
 
             return true
@@ -72,7 +69,7 @@ fun OsmMapView(
                     addMapListener(mapListener)
                 }
 
-                updateMapViewState(mapView, viewModel, locationData, onCircleClick)
+                updateMapViewState(mapView, mapViewModel, locationData, onCircleClick)
 
                 invalidate()
             }
@@ -142,12 +139,12 @@ private fun initializeMapView(mapView: MapView, viewModel: MapViewModel) {
 
 private fun updateMapViewState(
     mapView: MapView,
-    viewModel: MapViewModel,
+    mapViewModel: MapViewModel,
     locationData: LocationData,
     onCircleClick: () -> Unit
 ) {
-    mapView.mapOrientation = viewModel.mapOrientation
-    mapView.controller.setZoom(viewModel.zoomLevel)
+    mapView.mapOrientation = mapViewModel.mapOrientation
+    mapView.controller.setZoom(mapViewModel.zoomLevel)
 
     val existingCircle = mapView.overlays.find { it is CircleOverlay }
     if (existingCircle != null) {
@@ -162,8 +159,8 @@ private fun updateMapViewState(
     )
     mapView.overlays.add(circleOverlay)
 
-    if (viewModel.centerLocation != locationData.location) {
-        viewModel.centerLocation = locationData.location
-        mapView.controller.animateTo(viewModel.centerLocation, viewModel.zoomLevel, 500)
+    if (mapViewModel.centerLocation != locationData.location) {
+        mapViewModel.centerLocation = locationData.location
+        mapView.controller.animateTo(mapViewModel.centerLocation, mapViewModel.zoomLevel, 500)
     }
 }
