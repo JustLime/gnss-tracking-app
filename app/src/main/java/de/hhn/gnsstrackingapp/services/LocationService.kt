@@ -39,7 +39,6 @@ class LocationService : Service() {
                 longitude?.let { lon ->
                     getLocationName(lat, lon) { locationName ->
                         startForegroundNotification(lat, lon, locationName, accuracy)
-                        // Notify the observer
                         onLocationUpdate?.invoke(lat, lon, locationName, accuracy)
                     }
                 }

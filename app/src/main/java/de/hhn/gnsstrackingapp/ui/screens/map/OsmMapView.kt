@@ -20,9 +20,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ScaleBarOverlay
-import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
-
 
 @Composable
 fun OsmMapView(
@@ -30,12 +28,12 @@ fun OsmMapView(
     mapView: MapView,
     mapViewModel: MapViewModel,
     locationViewModel: LocationViewModel,
-    onCircleClick: () -> Unit
+    onCircleClick: () -> Unit = {}
 ) {
     val locationData by locationViewModel.locationData.collectAsState()
 
     DisposableEffect(mapView) {
-        initializeMapView(mapView, mapViewModel)
+        initializeMapView(mapView)
         onDispose {
             mapView.overlays.removeIf { it is CircleOverlay }
         }
@@ -86,7 +84,6 @@ fun rememberMapViewWithLifecycle(): MapView {
         }
     }
 
-    // Makes MapView follow the lifecycle of this composable
     val lifecycleObserver = rememberMapLifecycleObserver(mapView)
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
@@ -115,7 +112,7 @@ private fun MapView.hasMapListener(listener: MapListener): Boolean {
     return overlays.any { it == listener }
 }
 
-private fun initializeMapView(mapView: MapView, viewModel: MapViewModel) {
+private fun initializeMapView(mapView: MapView) {
     mapView.apply {
         setUseDataConnection(true)
         setTileSource(TileSourceFactory.MAPNIK)
@@ -125,15 +122,11 @@ private fun initializeMapView(mapView: MapView, viewModel: MapViewModel) {
         val rotationGestureOverlay = RotationGestureOverlay(this).apply { isEnabled = true }
         val scaleOverlay = ScaleBarOverlay(this).apply {
             setCentred(true)
-            setScaleBarOffset(300, 50)
-        }
-        val compassOverlay = CompassOverlay(context, this).apply {
-            enableCompass()
+            setScaleBarOffset(300, 450)
         }
 
         overlays.add(rotationGestureOverlay)
         overlays.add(scaleOverlay)
-//        overlays.add(compassOverlay)
     }
 }
 

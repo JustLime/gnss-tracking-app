@@ -1,6 +1,5 @@
 package de.hhn.gnsstrackingapp.network
 
-
 import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -23,28 +22,38 @@ class WebServicesProvider(private val url: String) {
     var socketEventChannel: Channel<SocketUpdate> = Channel(10)
 
     suspend fun startSocket() {
-        client.webSocket(urlString = url) {
-            Log.d("WebSocket", "Connected to WebSocket: $url")
+        try {
+            client.webSocket(urlString = url) {
+                Log.d("WebSocket", "Connected to WebSocket: $url")
 
-            while (isActive) {
-                when (val frame = incoming.receive()) {
-                    is Frame.Text -> {
-                        val message = frame.readText()
-                        socketEventChannel.send(SocketUpdate(text = message))
-                    }
+                while (isActive) {
+                    try {
+                        when (val frame = incoming.receive()) {
+                            is Frame.Text -> {
+                                val message = frame.readText()
+                                socketEventChannel.send(SocketUpdate(text = message))
+                            }
 
-                    is Frame.Binary -> {
-                        val data = frame.data
-                        socketEventChannel.send(SocketUpdate(byteString = data.toByteString()))
-                    }
+                            is Frame.Binary -> {
+                                val data = frame.data
+                                socketEventChannel.send(SocketUpdate(byteString = data.toByteString()))
+                            }
 
-                    else -> {
-                        Log.d("WebSocket", "Received Unsupported Frame: $frame")
+                            else -> {
+                                Log.d("WebSocket", "Received Unsupported Frame: $frame")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("WebSocket", "Error receiving frame: ${e.message}", e)
                     }
                 }
             }
+        } catch (e: Exception) {
+            Log.e("WebSocket", "WebSocket connection failed: ${e.message}", e)
+            socketEventChannel.send(SocketUpdate(exception = e))
         }
     }
+
 
     fun stopSocket() {
         runBlocking {

@@ -26,7 +26,7 @@ fun StatisticsScreen(statisticsViewModel: StatisticsViewModel) {
     // Launch WebSocket listener and handle updates
     LaunchedEffect(true) {
         webSocketScope.launch {
-            val webServicesProvider = WebServicesProvider("ws://192.168.2.225:80")
+            val webServicesProvider = WebServicesProvider("ws://192.168.221.60:80")
             startSocketScope.launch {
                 webServicesProvider.startSocket() // Start WebSocket connection
             }
