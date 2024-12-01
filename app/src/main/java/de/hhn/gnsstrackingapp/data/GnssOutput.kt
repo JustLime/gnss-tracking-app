@@ -9,4 +9,5 @@ data class GnssOutput(
     val vAcc: Long,
     val elev: String,
     val rtcmEnabled: Boolean,
+    val exception: String?
 )

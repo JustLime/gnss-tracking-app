@@ -16,6 +16,11 @@ class StatisticsViewModel : ViewModel() {
                 vAcc = 0,
                 elev = "",
                 rtcmEnabled = false,
+                exception = null
             )
         )
+
+    fun updateGnssOutput(newGnssOutput: GnssOutput) {
+        gnssOutput.value = newGnssOutput
+    }
 }

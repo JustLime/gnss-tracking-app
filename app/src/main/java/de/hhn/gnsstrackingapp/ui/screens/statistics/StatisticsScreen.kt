@@ -4,44 +4,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.ChipColors
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
 import de.hhn.gnsstrackingapp.data.GnssOutput
 import de.hhn.gnsstrackingapp.network.WebServicesProvider
-import kotlinx.coroutines.launch
 
 @Composable
-fun StatisticsScreen(statisticsViewModel: StatisticsViewModel) {
-    val typography = Typography()
-    val webSocketScope = rememberCoroutineScope()
-    val startSocketScope = rememberCoroutineScope()
+fun StatisticsScreen(
+    statisticsViewModel: StatisticsViewModel,
+    webServicesProvider: WebServicesProvider
+) {
+    val gnssOutput by statisticsViewModel.gnssOutput // Observe gnssOutput from ViewModel
 
-    // Launch WebSocket listener and handle updates
-    LaunchedEffect(true) {
-        webSocketScope.launch {
-            val webServicesProvider = WebServicesProvider("ws://192.168.221.60:80")
-            startSocketScope.launch {
-                webServicesProvider.startSocket() // Start WebSocket connection
-            }
-
-            // Listen for updates from the WebSocket channel
-            for (socketUpdate in webServicesProvider.socketEventChannel) {
-                socketUpdate.text?.let { jsonData ->
-                    statisticsViewModel.gnssOutput.value =
-                        parseGnssJson(jsonData)
-                }
-            }
-        }
-    }
-
-    // UI to display GNSS data
     Column(
         modifier = Modifier
             .padding(16.dp),
@@ -49,8 +33,10 @@ fun StatisticsScreen(statisticsViewModel: StatisticsViewModel) {
     ) {
         Text(
             text = "Statistics",
-            fontSize = typography.headlineLarge.fontSize
+            fontSize = Typography().headlineLarge.fontSize
         )
+
+        ConnectedWebSocketChip(webServicesProvider)
 
         ElevatedCard {
             Column(
@@ -58,24 +44,47 @@ fun StatisticsScreen(statisticsViewModel: StatisticsViewModel) {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = "Time: ${statisticsViewModel.gnssOutput.value.time}")
-                Text(text = "Longitude: ${statisticsViewModel.gnssOutput.value.lon}")
-                Text(text = "Latitude: ${statisticsViewModel.gnssOutput.value.lat}")
-                Text(text = "Fix Type: ${statisticsViewModel.gnssOutput.value.fixType}")
-                Text(text = "Horizontal Accuracy: ${statisticsViewModel.gnssOutput.value.hAcc}")
-                Text(text = "Vertical Accuracy: ${statisticsViewModel.gnssOutput.value.vAcc}")
-                Text(text = "Elevation: ${statisticsViewModel.gnssOutput.value.elev}")
-                Text(text = "RTCM Enabled: ${statisticsViewModel.gnssOutput.value.rtcmEnabled}")
+                Text(text = "Time: ${gnssOutput.time}")
+                Text(text = "Longitude: ${gnssOutput.lon}")
+                Text(text = "Latitude: ${gnssOutput.lat}")
+                Text(text = "Fix Type: ${gnssOutput.fixType}")
+                Text(text = "Horizontal Accuracy: ${gnssOutput.hAcc}")
+                Text(text = "Vertical Accuracy: ${gnssOutput.vAcc}")
+                Text(text = "Elevation: ${gnssOutput.elev}")
+                Text(text = "RTCM Enabled: ${gnssOutput.rtcmEnabled}")
             }
         }
     }
 }
 
+@Composable
+fun ConnectedWebSocketChip(webServicesProvider: WebServicesProvider) {
+    val chipColors: ChipColors = if (webServicesProvider.connected.value) {
+        AssistChipDefaults.assistChipColors(
+            containerColor = Color.Green
+        )
+    } else {
+        AssistChipDefaults.assistChipColors(
+            containerColor = Color.Red
+        )
+    }
+
+    AssistChip(
+        onClick = {},
+        label = {
+            Text(
+                text = if (webServicesProvider.connected.value) "Connected to WebSocket"
+                else "Disconnected from WebSocket"
+            )
+        },
+        colors = chipColors
+    )
+}
+
+
 fun parseGnssJson(json: String): GnssOutput {
-    // Assuming you're using Gson to parse the GNSS response:
-    val gson = Gson()
     return try {
-        gson.fromJson(json, GnssOutput::class.java)
+        Gson().fromJson(json, GnssOutput::class.java)
     } catch (e: Exception) {
         GnssOutput(
             time = "",
@@ -86,6 +95,7 @@ fun parseGnssJson(json: String): GnssOutput {
             vAcc = 0,
             elev = "",
             rtcmEnabled = false,
+            exception = null
         )
     }
 }

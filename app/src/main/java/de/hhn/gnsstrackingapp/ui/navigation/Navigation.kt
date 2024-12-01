@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import de.hhn.gnsstrackingapp.network.WebServicesProvider
 import de.hhn.gnsstrackingapp.ui.screens.map.LocationViewModel
 import de.hhn.gnsstrackingapp.ui.screens.map.MapScreen
 import de.hhn.gnsstrackingapp.ui.screens.map.MapViewModel
@@ -19,11 +20,17 @@ fun MainNavigation(
     mapViewModel: MapViewModel,
     locationViewModel: LocationViewModel,
     statisticsViewModel: StatisticsViewModel,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    webServicesProvider: WebServicesProvider
 ) {
     NavHost(navController = navHostController, startDestination = Screen.MapScreen.route) {
         composable(Screen.MapScreen.route) { MapScreen(mapViewModel, locationViewModel) }
-        composable(Screen.StatisticsScreen.route) { StatisticsScreen(statisticsViewModel) }
+        composable(Screen.StatisticsScreen.route) {
+            StatisticsScreen(
+                statisticsViewModel,
+                webServicesProvider
+            )
+        }
         composable(Screen.SettingsScreen.route) { SettingsScreen(settingsViewModel) }
     }
 }

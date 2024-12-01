@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import de.hhn.gnsstrackingapp.network.WebServicesProvider
 import de.hhn.gnsstrackingapp.services.LocationService
@@ -22,7 +23,9 @@ import de.hhn.gnsstrackingapp.ui.screens.map.LocationViewModel
 import de.hhn.gnsstrackingapp.ui.screens.map.MapViewModel
 import de.hhn.gnsstrackingapp.ui.screens.settings.SettingsViewModel
 import de.hhn.gnsstrackingapp.ui.screens.statistics.StatisticsViewModel
+import de.hhn.gnsstrackingapp.ui.screens.statistics.parseGnssJson
 import de.hhn.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
@@ -44,7 +47,7 @@ class MainActivity : ComponentActivity() {
         serviceManager = ServiceManager(this)
 
         // Setup OsmDroid user agent because the default is "osmdroid" which is banned
-        // and will cause OsmDroid to crash or not loading maps
+        // and will cause OsmDroid to crash or not load maps
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         val requestPermissionLauncher =
@@ -67,6 +70,18 @@ class MainActivity : ComponentActivity() {
             locationViewModel.updateLocation(GeoPoint(latitude, longitude), locationName, accuracy)
         }
 
+        val webServicesProvider = WebServicesProvider("ws://192.168.221.60:80")
+        lifecycleScope.launch {
+            webServicesProvider.startSocket()
+        }
+        lifecycleScope.launch {
+            for (socketUpdate in webServicesProvider.socketEventChannel) {
+                socketUpdate.text?.let { jsonData ->
+                    statisticsViewModel.updateGnssOutput(parseGnssJson(jsonData))
+                }
+            }
+        }
+
         setContent {
             GNSSTrackingAppTheme {
                 val navHostController = rememberNavController()
@@ -75,7 +90,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     Scaffold(bottomBar = {
-                        NavigationBarComponent(navController = navHostController)
+                        NavigationBarComponent(navHostController)
                     }, content = { padding ->
                         Column(Modifier.padding(padding)) {
                             MainNavigation(
@@ -83,7 +98,8 @@ class MainActivity : ComponentActivity() {
                                 mapViewModel,
                                 locationViewModel,
                                 statisticsViewModel,
-                                settingsViewModel
+                                settingsViewModel,
+                                webServicesProvider
                             )
                         }
                     })

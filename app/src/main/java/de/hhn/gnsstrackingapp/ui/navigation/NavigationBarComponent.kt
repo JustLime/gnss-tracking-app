@@ -7,8 +7,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -16,13 +14,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 
 @Composable
-fun NavigationBarComponent(navController: NavController) {
+fun NavigationBarComponent(
+    navController: NavController,
+) {
     val selectedItem = remember { mutableIntStateOf(0) }
-
     val navigationItems = listOf(
         NavigationItem(
             label = "Map",
@@ -48,22 +46,11 @@ fun NavigationBarComponent(navController: NavController) {
         navigationItems.forEachIndexed { index, item ->
             NavigationBarItem(
                 icon = {
-                    BadgedBox(
-                        badge = {
-                            val badgeColor = when (item.screen.hasUpdated) {
-                                true -> Color.Green
-                                false -> Color.Red
-                                else -> Color.Transparent
-                            }
-                            Badge(containerColor = badgeColor)
-                        }
-                    ) {
-                        Icon(
-                            if (selectedItem.intValue == index) item.selectedIcon
-                            else item.unselectedIcon,
-                            contentDescription = item.label
-                        )
-                    }
+                    Icon(
+                        if (selectedItem.intValue == index) item.selectedIcon
+                        else item.unselectedIcon,
+                        contentDescription = item.label
+                    )
                 },
                 label = { Text(item.label) },
                 selected = selectedItem.intValue == index,

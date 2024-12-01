@@ -22,6 +22,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
+
 @Composable
 fun OsmMapView(
     modifier: Modifier = Modifier,
@@ -33,7 +34,7 @@ fun OsmMapView(
     val locationData by locationViewModel.locationData.collectAsState()
 
     DisposableEffect(mapView) {
-        initializeMapView(mapView)
+        initializeMapView(mapView, mapViewModel)
         onDispose {
             mapView.overlays.removeIf { it is CircleOverlay }
         }
@@ -112,7 +113,9 @@ private fun MapView.hasMapListener(listener: MapListener): Boolean {
     return overlays.any { it == listener }
 }
 
-private fun initializeMapView(mapView: MapView) {
+private fun initializeMapView(
+    mapView: MapView, mapViewModel: MapViewModel,
+) {
     mapView.apply {
         setUseDataConnection(true)
         setTileSource(TileSourceFactory.MAPNIK)
@@ -127,6 +130,8 @@ private fun initializeMapView(mapView: MapView) {
 
         overlays.add(rotationGestureOverlay)
         overlays.add(scaleOverlay)
+
+        mapView.controller.animateTo(mapViewModel.centerLocation, mapViewModel.zoomLevel, 500)
     }
 }
 
