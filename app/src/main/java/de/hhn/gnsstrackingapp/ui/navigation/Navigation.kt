@@ -27,8 +27,7 @@ fun MainNavigation(
         composable(Screen.MapScreen.route) { MapScreen(mapViewModel, locationViewModel) }
         composable(Screen.StatisticsScreen.route) {
             StatisticsScreen(
-                statisticsViewModel,
-                webServicesProvider
+                statisticsViewModel, webServicesProvider
             )
         }
         composable(Screen.SettingsScreen.route) { SettingsScreen(settingsViewModel) }

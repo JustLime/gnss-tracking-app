@@ -89,14 +89,11 @@ class LocationService : Service() {
         )
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Tracking Location")
+            .setSmallIcon(R.drawable.ic_launcher_foreground).setContentTitle("Tracking Location")
             .setContentText("$lastKnownLocationName ($latitude, $longitude) - Accuracy: $accuracy m")
             .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .build()
+            .setCategory(NotificationCompat.CATEGORY_SERVICE).setContentIntent(pendingIntent)
+            .setOngoing(true).build()
 
         startForeground(1, notification)
     }

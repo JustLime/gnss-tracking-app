@@ -16,7 +16,6 @@ class CircleOverlay(
     private val accuracyInMeters: Float,
     private val onClick: () -> Unit
 ) : Overlay() {
-
     private val fillColor: Int = Purple80.copy(alpha = 0.7f).toArgb()
     private val strokeColor: Int = Purple40.toArgb()
     private val strokeWidthCircle: Float = 5f
@@ -49,28 +48,18 @@ class CircleOverlay(
         val radiusInPixels = (screenWidth * fractionOfScreen).toInt()
         val projection = mapView.projection
         val screenPoint = projection.toPixels(center, null)
-        val accuracyRadiusInPixels =
-            mapView.projection.metersToPixels(accuracyInMeters)
+        val accuracyRadiusInPixels = mapView.projection.metersToPixels(accuracyInMeters)
 
         canvas.drawCircle(
-            screenPoint.x.toFloat(),
-            screenPoint.y.toFloat(),
-            accuracyRadiusInPixels,
-            accuracyPaint
+            screenPoint.x.toFloat(), screenPoint.y.toFloat(), accuracyRadiusInPixels, accuracyPaint
         )
 
         canvas.drawCircle(
-            screenPoint.x.toFloat(),
-            screenPoint.y.toFloat(),
-            radiusInPixels.toFloat(),
-            paint
+            screenPoint.x.toFloat(), screenPoint.y.toFloat(), radiusInPixels.toFloat(), paint
         )
 
         canvas.drawCircle(
-            screenPoint.x.toFloat(),
-            screenPoint.y.toFloat(),
-            radiusInPixels.toFloat(),
-            strokePaint
+            screenPoint.x.toFloat(), screenPoint.y.toFloat(), radiusInPixels.toFloat(), strokePaint
         )
     }
 

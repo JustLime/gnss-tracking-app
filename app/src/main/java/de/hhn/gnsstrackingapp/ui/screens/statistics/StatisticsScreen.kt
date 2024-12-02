@@ -14,25 +14,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
+import de.hhn.gnsstrackingapp.R
 import de.hhn.gnsstrackingapp.data.GnssOutput
 import de.hhn.gnsstrackingapp.network.WebServicesProvider
 
 @Composable
 fun StatisticsScreen(
-    statisticsViewModel: StatisticsViewModel,
-    webServicesProvider: WebServicesProvider
+    statisticsViewModel: StatisticsViewModel, webServicesProvider: WebServicesProvider
 ) {
     val gnssOutput by statisticsViewModel.gnssOutput // Observe gnssOutput from ViewModel
 
     Column(
-        modifier = Modifier
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(32.dp)
+        modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
         Text(
-            text = "Statistics",
+            text = stringResource(R.string.statistics),
             fontSize = Typography().headlineLarge.fontSize
         )
 
@@ -44,14 +43,14 @@ fun StatisticsScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = "Time: ${gnssOutput.time}")
-                Text(text = "Longitude: ${gnssOutput.lon}")
-                Text(text = "Latitude: ${gnssOutput.lat}")
-                Text(text = "Fix Type: ${gnssOutput.fixType}")
-                Text(text = "Horizontal Accuracy: ${gnssOutput.hAcc}")
-                Text(text = "Vertical Accuracy: ${gnssOutput.vAcc}")
-                Text(text = "Elevation: ${gnssOutput.elev}")
-                Text(text = "RTCM Enabled: ${gnssOutput.rtcmEnabled}")
+                Text(text = stringResource(R.string.time, gnssOutput.time))
+                Text(text = stringResource(R.string.longitude, gnssOutput.lon))
+                Text(text = stringResource(R.string.latitude, gnssOutput.lat))
+                Text(text = stringResource(R.string.fix_type, gnssOutput.fixType))
+                Text(text = stringResource(R.string.horizontal_accuracy, gnssOutput.hAcc))
+                Text(text = stringResource(R.string.vertical_accuracy, gnssOutput.vAcc))
+                Text(text = stringResource(R.string.elevation, gnssOutput.elev))
+                Text(text = stringResource(R.string.rtcm_enabled, gnssOutput.rtcmEnabled))
             }
         }
     }
@@ -69,15 +68,12 @@ fun ConnectedWebSocketChip(webServicesProvider: WebServicesProvider) {
         )
     }
 
-    AssistChip(
-        onClick = {},
-        label = {
-            Text(
-                text = if (webServicesProvider.connected.value) "Connected to WebSocket"
-                else "Disconnected from WebSocket"
-            )
-        },
-        colors = chipColors
+    AssistChip(onClick = {}, label = {
+        Text(
+            text = if (webServicesProvider.connected.value) stringResource(R.string.connected_to_websocket)
+            else stringResource(R.string.disconnected_from_websocket)
+        )
+    }, colors = chipColors
     )
 }
 

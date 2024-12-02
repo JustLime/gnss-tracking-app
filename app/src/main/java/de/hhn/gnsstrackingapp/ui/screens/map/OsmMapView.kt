@@ -44,7 +44,6 @@ fun OsmMapView(
         override fun onScroll(event: ScrollEvent?): Boolean {
             event?.let {
                 mapViewModel.mapOrientation = it.source.mapOrientation
-                mapViewModel.isAnimating = false
             }
 
             return true
@@ -60,8 +59,7 @@ fun OsmMapView(
 
     }
 
-    AndroidView(
-        factory = { mapView },
+    AndroidView(factory = { mapView },
         modifier = modifier.fillMaxSize(),
         update = { mapViewUpdate ->
             mapViewUpdate.apply {
@@ -73,8 +71,7 @@ fun OsmMapView(
 
                 invalidate()
             }
-        }
-    )
+        })
 }
 
 @Composable
@@ -145,26 +142,18 @@ private fun updateMapViewState(
     mapView.mapOrientation = mapViewModel.mapOrientation
     mapView.controller.setZoom(mapViewModel.zoomLevel)
 
-    val existingCircle = mapView.overlays.find { it is CircleOverlay }
-    if (existingCircle != null) {
-        mapView.overlays.remove(existingCircle)
-    }
+    mapView.overlays.removeIf { it is CircleOverlay }
 
     val circleOverlay = CircleOverlay(
-        locationData.location,
-        0.03f,
-        locationData.accuracy,
-        onCircleClick
+        locationData.location, 0.03f, locationData.accuracy, onCircleClick
     )
     mapView.overlays.add(circleOverlay)
 
-    if (mapViewModel.centerLocation != locationData.location) {
+    if (mapViewModel.isAnimating.value && mapViewModel.centerLocation != locationData.location) {
         mapViewModel.centerLocation = locationData.location
 
-        if (!mapViewModel.isAnimating) {
-            mapViewModel.isAnimating = true
-            mapView.controller.animateTo(mapViewModel.centerLocation, mapViewModel.zoomLevel, 500)
-            mapViewModel.isAnimating = false
-        }
+        mapView.controller.animateTo(mapViewModel.centerLocation, mapViewModel.zoomLevel, 500)
+
+        mapViewModel.isAnimating.value = false
     }
 }

@@ -37,15 +37,13 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
         )
 
         SettingsListItem("Your setting",
-            "Here you can setup your setting based on your extension. Add as many settings you need.",
+            "Here you can setup your setting based on your extension. Add as many settings as you need.",
             icon = Icons.Outlined.Build,
             contentDescription = "Sensor IP Address",
             content = {
                 Button(
-                    onClick = {},
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Purple40,
-                        contentColor = Color.White
+                    onClick = {}, colors = ButtonDefaults.buttonColors(
+                        containerColor = Purple40, contentColor = Color.White
                     )
                 ) {
                     Text(text = "I'm a button")

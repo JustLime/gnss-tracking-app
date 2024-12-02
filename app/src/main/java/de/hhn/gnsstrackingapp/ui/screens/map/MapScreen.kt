@@ -28,6 +28,10 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.hhn.gnsstrackingapp.ui.theme.Purple40
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 @Composable
 fun MapScreen(
@@ -52,21 +56,25 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             GetOwnLocationButton(onClick = {
-                if (!mapViewModel.isAnimating) {
-                    mapViewModel.centerLocation = locationViewModel.locationData.value.location
-                    mapViewModel.zoomLevel = 20.0
+                val targetLocation = locationViewModel.locationData.value.location
+                val distance = calculateDistance(
+                    mapViewModel.centerLocation.latitude,
+                    mapViewModel.centerLocation.longitude,
+                    targetLocation.latitude,
+                    targetLocation.longitude
+                )
+                val animationDuration = calculateAnimationDuration(
+                    distance, mapViewModel.zoomLevel
+                )
 
-                    mapViewModel.isAnimating = true
+                mapViewModel.centerLocation = targetLocation
+                mapViewModel.zoomLevel = 20.0
 
-                    mapView.controller.animateTo(
-                        locationViewModel.locationData.value.location,
-                        mapViewModel.zoomLevel,
-                        3000L,
-                        0f
-                    )
-
-                    mapViewModel.isAnimating = false
-                }
+                mapViewModel.isAnimating.value = true
+                mapView.controller.animateTo(
+                    mapViewModel.centerLocation, mapViewModel.zoomLevel, animationDuration, 0f
+                )
+                mapViewModel.isAnimating.value = false
             })
         }
     }
@@ -75,7 +83,8 @@ fun MapScreen(
 @Composable
 fun GetOwnLocationButton(onClick: () -> Unit) {
     FloatingActionButton(
-        onClick = { onClick() }, modifier = Modifier.padding(16.dp),
+        onClick = { onClick() },
+        modifier = Modifier.padding(16.dp),
         containerColor = Purple40,
         contentColor = Color.White
     ) {
@@ -117,24 +126,21 @@ fun LocationCard(locationData: LocationData) {
                 )
             }
             Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
+                horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = "${locationData.location.latitude}° ${
                         getLatitudeDirection(
                             locationData.location.latitude
                         )
-                    }",
-                    fontSize = 16.sp
+                    }", fontSize = 16.sp
                 )
                 Text(
                     text = "${locationData.location.longitude}° ${
                         getLongitudeDirection(
                             locationData.location.longitude
                         )
-                    }",
-                    fontSize = 16.sp
+                    }", fontSize = 16.sp
                 )
             }
         }
@@ -147,4 +153,28 @@ fun getLatitudeDirection(latitude: Double): String {
 
 fun getLongitudeDirection(longitude: Double): String {
     return if (longitude >= 0) "E" else "W" // East if positive, West if negative
+}
+
+fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    val earthRadius = 6371e3 // Earth's radius in meters
+    val dLat = Math.toRadians(lat2 - lat1)
+    val dLon = Math.toRadians(lon2 - lon1)
+    val a =
+        sin(dLat / 2) * sin(dLat / 2) + cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(
+            dLon / 2
+        ) * sin(dLon / 2)
+    val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    return earthRadius * c // Distance in meters
+}
+
+fun calculateAnimationDuration(distance: Double, zoomLevel: Double): Long {
+    val baseDuration = 2000L
+    val distanceFactor = distance / 1000.0
+    val zoomFactor = 1.0 / (zoomLevel + 1.0)
+    val calculatedDuration =
+        baseDuration + (distanceFactor * 500).toLong() + (zoomFactor * 1000).toLong()
+    val maxDuration = 5000L
+
+    return calculatedDuration.coerceAtMost(maxDuration)
 }

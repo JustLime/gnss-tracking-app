@@ -16,7 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import de.hhn.gnsstrackingapp.R
 import de.hhn.gnsstrackingapp.ui.theme.Purple40
 
 @Composable
@@ -26,19 +28,17 @@ fun NavigationBarComponent(
     val selectedItem = remember { mutableIntStateOf(0) }
     val navigationItems = listOf(
         NavigationItem(
-            label = "Map",
+            label = stringResource(R.string.map),
             screen = Screen.MapScreen,
             selectedIcon = Icons.Filled.LocationOn,
             unselectedIcon = Icons.Outlined.LocationOn
-        ),
-        NavigationItem(
-            label = "Statistics",
+        ), NavigationItem(
+            label = stringResource(R.string.statistics),
             screen = Screen.StatisticsScreen,
             selectedIcon = Icons.Filled.Info,
             unselectedIcon = Icons.Outlined.Info
-        ),
-        NavigationItem(
-            label = "Settings",
+        ), NavigationItem(
+            label = stringResource(R.string.settings),
             screen = Screen.SettingsScreen,
             selectedIcon = Icons.Filled.Settings,
             unselectedIcon = Icons.Outlined.Settings
@@ -51,8 +51,7 @@ fun NavigationBarComponent(
                 icon = {
                     Icon(
                         if (selectedItem.intValue == index) item.selectedIcon
-                        else item.unselectedIcon,
-                        contentDescription = item.label
+                        else item.unselectedIcon, contentDescription = item.label
                     )
                 },
                 label = { Text(item.label) },
@@ -62,8 +61,7 @@ fun NavigationBarComponent(
                     navController.navigate(item.screen.route)
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.White,
-                    indicatorColor = Purple40
+                    selectedIconColor = Color.White, indicatorColor = Purple40
                 )
             )
         }

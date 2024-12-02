@@ -27,8 +27,6 @@ import de.hhn.gnsstrackingapp.ui.screens.statistics.parseGnssJson
 import de.hhn.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.osmdroid.config.Configuration
-import org.osmdroid.library.BuildConfig
 import org.osmdroid.util.GeoPoint
 
 
@@ -45,10 +43,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         serviceManager = ServiceManager(this)
-
-        // Setup OsmDroid user agent because the default is "osmdroid" which is banned
-        // and will cause OsmDroid to crash or not load maps
-        Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
 
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -115,4 +109,3 @@ class MainActivity : ComponentActivity() {
         webServicesProvider.stopSocket()
     }
 }
-

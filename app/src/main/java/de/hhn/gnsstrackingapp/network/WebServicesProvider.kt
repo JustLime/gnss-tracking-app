@@ -69,8 +69,7 @@ class WebServicesProvider(private val url: String) {
 
         if (retryCount == MAX_RETRIES) {
             Log.e(
-                "WebSocket",
-                "Max retry attempts reached. Could not establish WebSocket connection."
+                "WebSocket", "Max retry attempts reached. Could not establish WebSocket connection."
             )
         }
     }
