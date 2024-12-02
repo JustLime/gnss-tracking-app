@@ -10,11 +10,14 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import de.hhn.gnsstrackingapp.ui.theme.Purple40
 
 @Composable
 fun NavigationBarComponent(
@@ -57,7 +60,11 @@ fun NavigationBarComponent(
                 onClick = {
                     selectedItem.intValue = index
                     navController.navigate(item.screen.route)
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White,
+                    indicatorColor = Purple40
+                )
             )
         }
     }

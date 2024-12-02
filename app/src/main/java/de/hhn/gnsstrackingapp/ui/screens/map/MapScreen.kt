@@ -23,9 +23,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.hhn.gnsstrackingapp.ui.theme.Purple40
 
 @Composable
 fun MapScreen(
@@ -50,15 +52,21 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             GetOwnLocationButton(onClick = {
-                mapViewModel.centerLocation = locationViewModel.locationData.value.location
-                mapViewModel.zoomLevel = 20.0
+                if (!mapViewModel.isAnimating) {
+                    mapViewModel.centerLocation = locationViewModel.locationData.value.location
+                    mapViewModel.zoomLevel = 20.0
 
-                mapView.controller.animateTo(
-                    locationViewModel.locationData.value.location,
-                    mapViewModel.zoomLevel,
-                    3000L,
-                    0f
-                )
+                    mapViewModel.isAnimating = true
+
+                    mapView.controller.animateTo(
+                        locationViewModel.locationData.value.location,
+                        mapViewModel.zoomLevel,
+                        3000L,
+                        0f
+                    )
+
+                    mapViewModel.isAnimating = false
+                }
             })
         }
     }
@@ -67,7 +75,9 @@ fun MapScreen(
 @Composable
 fun GetOwnLocationButton(onClick: () -> Unit) {
     FloatingActionButton(
-        onClick = { onClick() }, modifier = Modifier.padding(16.dp)
+        onClick = { onClick() }, modifier = Modifier.padding(16.dp),
+        containerColor = Purple40,
+        contentColor = Color.White
     ) {
         Icon(Icons.Filled.LocationOn, "Floating action button.")
     }

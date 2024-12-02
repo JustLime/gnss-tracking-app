@@ -44,6 +44,7 @@ fun OsmMapView(
         override fun onScroll(event: ScrollEvent?): Boolean {
             event?.let {
                 mapViewModel.mapOrientation = it.source.mapOrientation
+                mapViewModel.isAnimating = false
             }
 
             return true
@@ -159,6 +160,11 @@ private fun updateMapViewState(
 
     if (mapViewModel.centerLocation != locationData.location) {
         mapViewModel.centerLocation = locationData.location
-        mapView.controller.animateTo(mapViewModel.centerLocation, mapViewModel.zoomLevel, 500)
+
+        if (!mapViewModel.isAnimating) {
+            mapViewModel.isAnimating = true
+            mapView.controller.animateTo(mapViewModel.centerLocation, mapViewModel.zoomLevel, 500)
+            mapViewModel.isAnimating = false
+        }
     }
 }
