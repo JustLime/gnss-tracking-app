@@ -31,15 +31,6 @@ compile speed.
 
 ### Implemented
 
-- Map screen for tracking own location
-    - Shows your location on the map as a circle, with accuracy support
-    - Pinch to zoom in and out
-    - Get your own location using the Geocoder API by pressing on the button at the bottom right
-- Real-time location notifications
-- Websocket connection to connect to a GNSS module
-- Statistics screen for visualizing GNSS data
-- Settings screen for customizing the app
-
 - Map Screen for Location Tracking
     - Displays your location as a circle on the map, with accuracy support
     - Pinch-to-zoom functionality for map navigation
