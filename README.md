@@ -33,6 +33,7 @@ compile speed.
 
 - Map Screen for Location Tracking
     - Displays your location as a circle on the map, with accuracy support
+    - Scale overlay
     - Pinch-to-zoom functionality for map navigation
     - Use the Geocoder API to find your location by tapping the button at the bottom right
 - Real-Time Location Notifications
