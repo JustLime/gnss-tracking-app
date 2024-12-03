@@ -21,11 +21,11 @@ compile speed.
 
 ## Screenshots
 
-<img src="screenshots/map_view_dark_mode.jpg" alt="MapScreen Dark Mode" width="725" height="1414">
-<img src="screenshots/map_view_light_mode.jpg" alt="MapScreen Light Mode" width="1079" height="2104">
-<img src="screenshots/settings_view.jpg" alt="Settings Screen" width="1440" height="2808">
-<img src="screenshots/statistics_view.jpg" alt="Statistics Screen" width="1440" height="2808">
-<img src="screenshots/notification_real_time_location.jpg" alt="Notification Real Time Location" width="884" height="229">
+<img src="screenshots/map_view_dark_mode.jpg" alt="MapScreen Dark Mode" width="500">
+<img src="screenshots/map_view_light_mode.jpg" alt="MapScreen Light Mode" width="500">
+<img src="screenshots/settings_view.jpg" alt="Settings Screen" width="500">
+<img src="screenshots/statistics_view.jpg" alt="Statistics Screen" width="500">
+<img src="screenshots/notification_real_time_location.jpg" alt="Notification Real Time Location" width="500">
 
 ## Features
 
