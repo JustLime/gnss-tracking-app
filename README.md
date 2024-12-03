@@ -56,15 +56,16 @@ compile speed.
 
 ### Configuration
 
-- Websocket Connection:
-    1. Connect the microcontroller with the GNSS module via a Mobile Hotspot
-    2. Retrieve the microcontroller's IP address
-    3. Set the IP address in the `webSocketIp` variable
-       in [BaseApplication.kt](app/src/main/java/de/hhn/gnsstrackingapp/BaseApplication.kt)
-    4. Update the IP address
-       in [network_security_config.xml](app/src/main/res/xml/network_security_config.xml) to allow
-       the insecure WebSocket connection, as required by Android's security policy
-    5. Build and run the app on your device
+#### Websocket Connection
+
+1. Connect the microcontroller with the GNSS module via a Mobile Hotspot
+2. Retrieve the microcontroller's IP address
+3. Set the IP address in the `webSocketIp` variable
+   in [BaseApplication.kt](app/src/main/java/de/hhn/gnsstrackingapp/BaseApplication.kt)
+4. Update the IP address
+   in [network_security_config.xml](app/src/main/res/xml/network_security_config.xml) to allow
+   the insecure WebSocket connection, as required by Android's security policy
+5. Build and run the app on your device
 
 ## Known Issues
 
