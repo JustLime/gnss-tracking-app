@@ -11,7 +11,10 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -19,16 +22,34 @@ import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
 import de.hhn.gnsstrackingapp.R
 import de.hhn.gnsstrackingapp.data.GnssOutput
+import de.hhn.gnsstrackingapp.data.NtripStatus
+import de.hhn.gnsstrackingapp.data.SatelliteSystems
+import de.hhn.gnsstrackingapp.network.RestApiClient
 import de.hhn.gnsstrackingapp.network.WebServicesProvider
 
 @Composable
 fun StatisticsScreen(
-    statisticsViewModel: StatisticsViewModel, webServicesProvider: WebServicesProvider
+    statisticsViewModel: StatisticsViewModel,
+    webServicesProvider: WebServicesProvider
 ) {
     val gnssOutput by statisticsViewModel.gnssOutput // Observe gnssOutput from ViewModel
+    val gnssSatelliteSystemsState = remember { mutableStateOf(SatelliteSystems(0, 0, 0, 0)) }
+    val gnssNtripStatusState = remember { mutableStateOf(NtripStatus(false)) }
+
+    // Fetch GNSS data when the composable is displayed
+    LaunchedEffect(Unit) {
+        if (webServicesProvider.connected.value) {
+            val client = RestApiClient()
+            gnssSatelliteSystemsState.value = client.getSatelliteSystems()
+
+            client.setNtripStatus(NtripStatus(true))
+            gnssNtripStatusState.value = client.getNtripStatus()
+        }
+    }
 
     Column(
-        modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(32.dp)
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
         Text(
             text = stringResource(R.string.statistics),
@@ -53,8 +74,33 @@ fun StatisticsScreen(
                 Text(text = stringResource(R.string.rtcm_enabled, gnssOutput.rtcmEnabled))
             }
         }
+
+        ElevatedCard {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                gnssSatelliteSystemsState.value.let { data ->
+                    Text(text = "{bds: ${data.bds}, gps: ${data.gps}, glo: ${data.glo}, gal: ${data.gal}}")
+                }
+            }
+        }
+
+//        ElevatedCard {
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(16.dp)
+//            ) {
+//                gnssNtripStatusState.value?.let { data ->
+//                    Text(text = data)
+//                } ?: Text(text = "Loading...")
+//            }
+//        }
     }
 }
+
 
 @Composable
 fun ConnectedWebSocketChip(webServicesProvider: WebServicesProvider) {
@@ -95,3 +141,6 @@ fun parseGnssJson(json: String): GnssOutput {
         )
     }
 }
+
+
+

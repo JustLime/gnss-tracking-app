@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
             locationViewModel.updateLocation(GeoPoint(latitude, longitude), locationName, accuracy)
         }
 
-        val webServicesProvider = WebServicesProvider("ws://${webSocketIp.value}:80")
+        val webServicesProvider = WebServicesProvider("ws://${baseUrl.value}:80")
         lifecycleScope.launch {
             webServicesProvider.startSocket()
         }

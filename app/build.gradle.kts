@@ -4,6 +4,8 @@ plugins {
 
     // Apply compose compiler module wise when working with Kotlin 2.0
     alias(libs.plugins.compose.compiler)
+
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 android {
@@ -81,6 +83,8 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.websockets)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json.jvm)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
@@ -93,6 +97,8 @@ dependencies {
 
     // Gson for JSON serialization
     implementation(libs.gson)
+
+    implementation(libs.kotlinx.serialization.json)
 
 
     testImplementation(libs.junit)
