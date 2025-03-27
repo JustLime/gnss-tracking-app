@@ -2,6 +2,7 @@ package de.hhn.gnsstrackingapp.ui.screens.statistics
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AssistChip
@@ -21,11 +22,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
 import de.hhn.gnsstrackingapp.R
+import de.hhn.gnsstrackingapp.data.FixType
 import de.hhn.gnsstrackingapp.data.GnssOutput
 import de.hhn.gnsstrackingapp.data.NtripStatus
 import de.hhn.gnsstrackingapp.data.SatelliteSystems
 import de.hhn.gnsstrackingapp.network.RestApiClient
 import de.hhn.gnsstrackingapp.network.WebServicesProvider
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Composable
 fun StatisticsScreen(
@@ -42,7 +46,7 @@ fun StatisticsScreen(
             val client = RestApiClient()
             gnssSatelliteSystemsState.value = client.getSatelliteSystems()
 
-            client.setNtripStatus(NtripStatus(true))
+//            client.setNtripStatus(NtripStatus(true))
             gnssNtripStatusState.value = client.getNtripStatus()
         }
     }
@@ -64,43 +68,59 @@ fun StatisticsScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = stringResource(R.string.time, gnssOutput.time))
-                Text(text = stringResource(R.string.longitude, gnssOutput.lon))
-                Text(text = stringResource(R.string.latitude, gnssOutput.lat))
-                Text(text = stringResource(R.string.fix_type, gnssOutput.fixType))
-                Text(text = stringResource(R.string.horizontal_accuracy, gnssOutput.hAcc))
-                Text(text = stringResource(R.string.vertical_accuracy, gnssOutput.vAcc))
-                Text(text = stringResource(R.string.elevation, gnssOutput.elev))
-                Text(text = stringResource(R.string.rtcm_enabled, gnssOutput.rtcmEnabled))
-            }
-        }
-
-        ElevatedCard {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                gnssSatelliteSystemsState.value.let { data ->
-                    Text(text = "{bds: ${data.bds}, gps: ${data.gps}, glo: ${data.glo}, gal: ${data.gal}}")
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = stringResource(R.string.time))
+                    Text(text = if (gnssOutput.time.isNotEmpty()) parseTime(gnssOutput.time) else "N/A")
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = stringResource(R.string.latitude))
+                    Text(
+                        text = if (gnssOutput.lat.isNotEmpty()) "${
+                            BigDecimal(
+                                convertToDecimalDegrees(gnssOutput.lat)
+                            ).setScale(7, RoundingMode.HALF_UP)
+                        }°" else "N/A"
+                    )
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = stringResource(R.string.longitude))
+                    Text(
+                        text = if (gnssOutput.lon.isNotEmpty()) "${
+                            BigDecimal(
+                                convertToDecimalDegrees(
+                                    gnssOutput.lon
+                                )
+                            ).setScale(
+                                7,
+                                RoundingMode.HALF_UP
+                            )
+                        }°" else "N/A"
+                    )
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = stringResource(R.string.fix_type))
+                    Text(text = FixType.fromValue(gnssOutput.fixType).description)
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = stringResource(R.string.horizontal_accuracy))
+                    Text(text = ("${gnssOutput.hAcc.toFloat() / 1000} m"))
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = stringResource(R.string.vertical_accuracy))
+                    Text(text = ("${gnssOutput.vAcc.toFloat() / 1000} m"))
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = stringResource(R.string.elevation))
+                    Text(text = if (gnssOutput.elev.isNotEmpty()) "${gnssOutput.elev} m" else "N/A")
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = stringResource(R.string.rtcm_enabled))
+                    Text(text = gnssOutput.rtcmEnabled.toString())
                 }
             }
         }
-
-//        ElevatedCard {
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(16.dp)
-//            ) {
-//                gnssNtripStatusState.value?.let { data ->
-//                    Text(text = data)
-//                } ?: Text(text = "Loading...")
-//            }
-//        }
     }
 }
-
 
 @Composable
 fun ConnectedWebSocketChip(webServicesProvider: WebServicesProvider) {
@@ -117,7 +137,8 @@ fun ConnectedWebSocketChip(webServicesProvider: WebServicesProvider) {
     AssistChip(onClick = {}, label = {
         Text(
             text = if (webServicesProvider.connected.value) stringResource(R.string.connected_to_websocket)
-            else stringResource(R.string.disconnected_from_websocket)
+            else stringResource(R.string.disconnected_from_websocket),
+            color = Color.Black
         )
     }, colors = chipColors
     )
@@ -142,5 +163,15 @@ fun parseGnssJson(json: String): GnssOutput {
     }
 }
 
+fun parseTime(time: String): String {
+    return time.substring(0, 2) + ":" + time.substring(2, 4) + ":" + time.substring(4, 6)
+}
 
+private fun convertToDecimalDegrees(coordinate: String): Double {
+    if (coordinate.isEmpty()) return 0.0
+    val rawValue = coordinate.toDouble()
+    val degrees = rawValue.toInt() / 100
+    val minutes = rawValue % 100
+    return degrees + (minutes / 60)
+}
 

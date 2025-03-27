@@ -28,6 +28,8 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.hhn.gnsstrackingapp.ui.theme.Purple40
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -129,14 +131,24 @@ fun LocationCard(locationData: LocationData) {
                 horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "${locationData.location.latitude}° ${
+                    text = "${
+                        BigDecimal(locationData.location.latitude).setScale(
+                            7,
+                            RoundingMode.HALF_UP
+                        )
+                    }° ${
                         getLatitudeDirection(
                             locationData.location.latitude
                         )
                     }", fontSize = 16.sp
                 )
                 Text(
-                    text = "${locationData.location.longitude}° ${
+                    text = "${
+                        BigDecimal(locationData.location.longitude).setScale(
+                            7,
+                            RoundingMode.HALF_UP
+                        )
+                    }° ${
                         getLongitudeDirection(
                             locationData.location.longitude
                         )

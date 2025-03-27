@@ -3,6 +3,7 @@ package de.hhn.gnsstrackingapp.network
 import android.util.Log
 import de.hhn.gnsstrackingapp.baseUrl
 import de.hhn.gnsstrackingapp.data.NtripStatus
+import de.hhn.gnsstrackingapp.data.Position
 import de.hhn.gnsstrackingapp.data.Precision
 import de.hhn.gnsstrackingapp.data.SatelliteSystems
 import de.hhn.gnsstrackingapp.data.UpdateRate
@@ -16,7 +17,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
@@ -52,7 +52,6 @@ class RestApiClient {
             response.body()
         } catch (e: Exception) {
             Log.e("getSatelliteSystems", "Error fetching data: ${e.localizedMessage}", e)
-//            "Error: ${e.localizedMessage}"
             return SatelliteSystems(0, 0, 0, 0)
         }
     }
@@ -67,92 +66,75 @@ class RestApiClient {
         }
     }
 
-    suspend fun getPrecision(): String? {
+    suspend fun getPrecision(): Precision {
         return try {
             val response: HttpResponse = client.get("http://${baseUrl.value}/precision")
-            response.bodyAsText()
+            response.body()
         } catch (e: Exception) {
             Log.e("getPrecision", "Error fetching data: ${e.localizedMessage}", e)
-            "Error: ${e.localizedMessage}"
+            return Precision("0", "0")
         }
     }
 
-    suspend fun getPosition(): String? {
+    suspend fun getPosition(): Position {
         return try {
             val response: HttpResponse = client.get("http://${baseUrl.value}/position")
-            response.bodyAsText()
+            response.body()
         } catch (e: Exception) {
             Log.e("getPosition", "Error fetching data: ${e.localizedMessage}", e)
-            "Error: ${e.localizedMessage}"
+            Position("", "", "", "", 0)
         }
     }
 
-    suspend fun setUpdateRate(updateRate: UpdateRate): String? {
+    suspend fun setUpdateRate(updateRate: UpdateRate): Int {
         return try {
             val response: HttpResponse = client.post("http://${baseUrl.value}/rate") {
                 contentType(ContentType.Application.Json)
                 setBody(updateRate)
             }
-            response.bodyAsText()
+            response.status.value
         } catch (e: Exception) {
             Log.e("setUpdateRate", "Error fetching data: ${e.localizedMessage}", e)
-            "Error: ${e.localizedMessage}"
+            400
         }
     }
 
-    suspend fun setSatelliteSystems(
-        bds: Int,
-        gps: Int,
-        glo: Int,
-        gal: Int
-    ): String? {
+    suspend fun setSatelliteSystems(satelliteSystems: SatelliteSystems): Int {
         return try {
             val response: HttpResponse = client.post("http://${baseUrl.value}/satsystems") {
                 contentType(ContentType.Application.Json)
-                setBody(
-                    SatelliteSystems(
-                        bds = bds,
-                        gps = gps,
-                        glo = glo,
-                        gal = gal
-                    )
-                )
+                setBody(satelliteSystems)
             }
-            response.bodyAsText()
+            response.status.value
         } catch (e: Exception) {
             Log.e("setSatelliteSystems", "Error fetching data: ${e.localizedMessage}", e)
-            "Error: ${e.localizedMessage}"
+            400
         }
     }
 
-    suspend fun setNtripStatus(ntripStatus: NtripStatus): String? {
+    suspend fun setNtripStatus(ntripStatus: NtripStatus): Int {
         return try {
             val response: HttpResponse = client.post("http://${baseUrl.value}/ntrip") {
                 contentType(ContentType.Application.Json)
                 setBody(ntripStatus)
             }
-            response.status.value.toString()
+            response.status.value
         } catch (e: Exception) {
             Log.e("setNtripStatus", "Error fetching data: ${e.localizedMessage}", e)
-            "Error: ${e.localizedMessage}"
+            400
         }
     }
 
-    suspend fun setPrecision(hAcc: String, vAcc: String): String? {
+    suspend fun setPrecision(precision: Precision): Int {
         return try {
             val response: HttpResponse = client.post("http://${baseUrl.value}/precision") {
                 contentType(ContentType.Application.Json)
-                setBody(
-                    Precision(
-                        hAcc = hAcc,
-                        vAcc = vAcc
-                    )
-                )
+                setBody(precision)
             }
-            response.bodyAsText()
+            response.status.value
         } catch (e: Exception) {
             Log.e("setPrecision", "Error fetching data: ${e.localizedMessage}", e)
-            "Error: ${e.localizedMessage}"
+            400
         }
     }
 }

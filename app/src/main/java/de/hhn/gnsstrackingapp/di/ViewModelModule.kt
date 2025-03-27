@@ -8,8 +8,9 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {
+    single { StatisticsViewModel() }
+
     viewModel { MapViewModel() }
-    viewModel { LocationViewModel() }
+    viewModel { LocationViewModel(get()) }
     viewModel { SettingsViewModel() }
-    viewModel { StatisticsViewModel() }
 }
