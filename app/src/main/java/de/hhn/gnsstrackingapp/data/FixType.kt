@@ -5,7 +5,7 @@ enum class FixType(val description: String) {
     GPS("GPS"),
     DGNSS("DGNSS"),
     PPS("PPS"),
-    RTF_FIXED("RTF Fixed"),
+    RTK_FIXED("RTK Fixed"),
     RTK_FLOAT("RTK Float"),
     ESTIMATED("Estimated (dead reckoning)"),
     MANUAL("Manual input mode"),
