@@ -1,6 +1,5 @@
 package de.hhn.gnsstrackingapp.ui.screens.map
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,8 +23,6 @@ class LocationViewModel(statisticsViewModel: StatisticsViewModel) : ViewModel() 
 
     fun updateLocation(location: GeoPoint, locationName: String, accuracy: Float) {
         viewModelScope.launch {
-            Log.d("gnss_sum", gnssOutput.toString())
-            Log.d("gnss", "${gnssOutput.lat}, ${gnssOutput.lon}")
             if (gnssOutput.lat.isNotEmpty() && gnssOutput.lon.isNotEmpty()) {
                 _locationData.emit(
                     LocationData(
