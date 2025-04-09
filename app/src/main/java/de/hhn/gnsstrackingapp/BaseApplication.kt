@@ -16,7 +16,8 @@ import java.io.File
 const val CHANNEL_ID = "GNSSTrackingApp"
 const val CHANNEL_NAME = "GNSSTrackingApp"
 
-val baseUrl = mutableStateOf("192.168.106.60")
+const val WEB_SOCKET_IP = "192.168.106.60"
+val baseUrl = mutableStateOf(WEB_SOCKET_IP)
 
 class BaseApplication : Application() {
     override fun onCreate() {
