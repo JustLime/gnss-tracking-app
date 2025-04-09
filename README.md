@@ -56,18 +56,21 @@ compile speed.
 
 #### Rover Firmware
 
+The source code for the firmware can be found in [de.hhn.gnss_rtk_rover](./lib/de.hhn.gnss_rtk_rover/).
+
 1. Change the global settings like WiFi credentials of your mobile hotspot and NTRIP credentials in [globals.py](./lib/de.hhn.gnss_rtk_rover/utils/globals.py)
 2. Build and flash the firmware to the microcontroller
 3. Run the microcontroller
 
 #### Websocket Connection
 
-1. Connect the microcontroller with the GNSS module via mobile hotspot of your
+1. Create a mobile hotspot on your smartphone
+2. Connect the microcontroller with the GNSS module via mobile hotspot of your
 smartphone
-2. Retrieve the microcontroller's IP address
-3. Set the IP address in the `WEB_SOCKET_IP` variable
+3. Retrieve the microcontroller's IP address
+4. Set the IP address in the `WEB_SOCKET_IP` variable
    in [BaseApplication.kt](app/src/main/java/de/hhn/gnsstrackingapp/BaseApplication.kt)
-4. Build and run the app on your device
+5. Build and run the app on your device
 
 ## Known Issues
 
