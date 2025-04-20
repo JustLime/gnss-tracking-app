@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {
     val websocketIp = mutableStateOf("192.168.106.60")
-    var webServicesProvider: WebServicesProvider? = null
+    private var webServicesProvider: WebServicesProvider? = null
 
     var ntripStatus = mutableStateOf(NtripStatus(enabled = false))
     val updateRate = mutableStateOf(UpdateRate(0))
