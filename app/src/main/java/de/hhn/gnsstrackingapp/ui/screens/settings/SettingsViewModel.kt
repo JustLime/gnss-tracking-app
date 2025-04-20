@@ -3,11 +3,18 @@ package de.hhn.gnsstrackingapp.ui.screens.settings
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import de.hhn.gnsstrackingapp.data.NtripStatus
 import de.hhn.gnsstrackingapp.data.SatelliteSystems
 import de.hhn.gnsstrackingapp.data.UpdateRate
+import de.hhn.gnsstrackingapp.network.WebServicesProvider
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {
+    val websocketIp = mutableStateOf("192.168.106.60")
+    var webServicesProvider: WebServicesProvider? = null
+
     var ntripStatus = mutableStateOf(NtripStatus(enabled = false))
     val updateRate = mutableStateOf(UpdateRate(0))
 
@@ -32,6 +39,15 @@ class SettingsViewModel : ViewModel() {
 
     fun updateGal(enabled: Boolean) {
         satelliteSystems.value = satelliteSystems.value.copy(gal = if (enabled) 1 else 0)
+    }
+
+    fun restartWebSocket() {
+        viewModelScope.launch {
+            webServicesProvider?.stopSocket()
+            delay(500) // optional safety gap
+            webServicesProvider = WebServicesProvider("ws://${websocketIp.value}:80")
+            webServicesProvider?.startSocket()
+        }
     }
 }
 

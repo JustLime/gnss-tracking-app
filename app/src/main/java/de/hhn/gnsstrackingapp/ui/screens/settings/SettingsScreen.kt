@@ -41,16 +41,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import de.hhn.gnsstrackingapp.baseUrl
 import de.hhn.gnsstrackingapp.data.NtripStatus
 import de.hhn.gnsstrackingapp.data.UpdateRate
 import de.hhn.gnsstrackingapp.network.RestApiClient
+import de.hhn.gnsstrackingapp.network.WebServicesProvider
 import de.hhn.gnsstrackingapp.ui.theme.Purple40
 import kotlinx.coroutines.launch
+import org.koin.core.context.GlobalContext.get
 
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel) {
-    val client = RestApiClient()
+    val ip = settingsViewModel.websocketIp.value
+
+    val client = RestApiClient(settingsViewModel)
     val coroutineScope = rememberCoroutineScope()
     val textState = remember { mutableStateOf(TextFieldValue(text = "")) }
 
@@ -83,7 +86,36 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
             Text(
                 text = "Settings", style = MaterialTheme.typography.headlineLarge
             )
-            Text(text = "Rover URL: ${baseUrl.value}")
+            Text(text = "Rover URL: ${settingsViewModel.websocketIp.value}")
+        }
+
+        item {
+            SettingsListItem(title = "Websocket IP",
+                description = "Sets the IP address of the GNSS receiver.",
+                icon = Icons.Outlined.Build,
+                content = {
+                    TextField(
+                        value = settingsViewModel.websocketIp.value,
+                        onValueChange = {
+                            settingsViewModel.websocketIp.value = it
+                        },
+                        modifier = Modifier.requiredWidth(200.dp)
+                    )
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                settingsViewModel.restartWebSocket()
+                                Log.d("SettingsScreen", "WebSocket restarted.")
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Purple40,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Update")
+                    }
+                })
         }
 
         item {
