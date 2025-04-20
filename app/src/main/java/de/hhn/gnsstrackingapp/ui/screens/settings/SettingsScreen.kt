@@ -94,26 +94,28 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
                 description = "Sets the IP address of the GNSS receiver.",
                 icon = Icons.Outlined.Build,
                 content = {
-                    TextField(
-                        value = settingsViewModel.websocketIp.value,
-                        onValueChange = {
-                            settingsViewModel.websocketIp.value = it
-                        },
-                        modifier = Modifier.requiredWidth(200.dp)
-                    )
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                settingsViewModel.restartWebSocket()
-                                Log.d("SettingsScreen", "WebSocket restarted.")
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Purple40,
-                            contentColor = Color.White
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        TextField(
+                            value = settingsViewModel.websocketIp.value,
+                            onValueChange = {
+                                settingsViewModel.websocketIp.value = it
+                            },
+                            modifier = Modifier.requiredWidth(150.dp)
                         )
-                    ) {
-                        Text("Update")
+                        Button(
+                            onClick = {
+                                coroutineScope.launch {
+                                    settingsViewModel.restartWebSocket()
+                                    Log.d("SettingsScreen", "WebSocket restarted.")
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Purple40,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Update")
+                        }
                     }
                 })
         }
