@@ -28,11 +28,13 @@ import de.hhn.gnsstrackingapp.data.NtripStatus
 import de.hhn.gnsstrackingapp.data.SatelliteSystems
 import de.hhn.gnsstrackingapp.network.RestApiClient
 import de.hhn.gnsstrackingapp.network.WebServicesProvider
+import de.hhn.gnsstrackingapp.ui.screens.settings.SettingsViewModel
 import java.math.BigDecimal
 import java.math.RoundingMode
 
 @Composable
 fun StatisticsScreen(
+    settingsViewModel: SettingsViewModel,
     statisticsViewModel: StatisticsViewModel,
     webServicesProvider: WebServicesProvider
 ) {
@@ -43,7 +45,7 @@ fun StatisticsScreen(
     // Fetch GNSS data when the composable is displayed
     LaunchedEffect(Unit) {
         if (webServicesProvider.connected.value) {
-            val client = RestApiClient()
+            val client = RestApiClient(settingsViewModel)
             gnssSatelliteSystemsState.value = client.getSatelliteSystems()
 
 //            client.setNtripStatus(NtripStatus(true))

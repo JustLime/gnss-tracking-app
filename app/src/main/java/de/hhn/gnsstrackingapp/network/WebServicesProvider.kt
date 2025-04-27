@@ -83,7 +83,7 @@ class WebServicesProvider(private val url: String) {
     }
 
     companion object {
-        private const val MAX_RETRIES = 5
+        private const val MAX_RETRIES = 1
         private const val RETRY_DELAY = 5000L // Delay between retries in milliseconds
     }
 }

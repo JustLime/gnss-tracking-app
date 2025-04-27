@@ -1,12 +1,12 @@
 package de.hhn.gnsstrackingapp.network
 
 import android.util.Log
-import de.hhn.gnsstrackingapp.baseUrl
 import de.hhn.gnsstrackingapp.data.NtripStatus
 import de.hhn.gnsstrackingapp.data.Position
 import de.hhn.gnsstrackingapp.data.Precision
 import de.hhn.gnsstrackingapp.data.SatelliteSystems
 import de.hhn.gnsstrackingapp.data.UpdateRate
+import de.hhn.gnsstrackingapp.ui.screens.settings.SettingsViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
@@ -23,7 +23,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 
-class RestApiClient {
+class RestApiClient(private val settingsViewModel: SettingsViewModel) {
     private val client = HttpClient(Android) {
         install(Logging) {
             level = LogLevel.ALL
@@ -38,7 +38,8 @@ class RestApiClient {
 
     suspend fun getUpdateRate(): UpdateRate {
         return try {
-            val response: HttpResponse = client.get("http://${baseUrl.value}/rate")
+            val response: HttpResponse =
+                client.get("http://${settingsViewModel.websocketIp.value}/rate")
             response.body()
         } catch (e: Exception) {
             Log.e("getUpdateRate", "Error fetching data: ${e.localizedMessage}", e)
@@ -48,7 +49,8 @@ class RestApiClient {
 
     suspend fun getSatelliteSystems(): SatelliteSystems {
         return try {
-            val response: HttpResponse = client.get("http://${baseUrl.value}/satsystems")
+            val response: HttpResponse =
+                client.get("http://${settingsViewModel.websocketIp.value}/satsystems")
             response.body()
         } catch (e: Exception) {
             Log.e("getSatelliteSystems", "Error fetching data: ${e.localizedMessage}", e)
@@ -58,7 +60,8 @@ class RestApiClient {
 
     suspend fun getNtripStatus(): NtripStatus {
         return try {
-            val response: HttpResponse = client.get("http://${baseUrl.value}/ntrip")
+            val response: HttpResponse =
+                client.get("http://${settingsViewModel.websocketIp.value}/ntrip")
             response.body()
         } catch (e: Exception) {
             Log.e("getNtripStatus", "Error fetching data: ${e.localizedMessage}", e)
@@ -68,7 +71,8 @@ class RestApiClient {
 
     suspend fun getPrecision(): Precision {
         return try {
-            val response: HttpResponse = client.get("http://${baseUrl.value}/precision")
+            val response: HttpResponse =
+                client.get("http://${settingsViewModel.websocketIp.value}/precision")
             response.body()
         } catch (e: Exception) {
             Log.e("getPrecision", "Error fetching data: ${e.localizedMessage}", e)
@@ -78,7 +82,8 @@ class RestApiClient {
 
     suspend fun getPosition(): Position {
         return try {
-            val response: HttpResponse = client.get("http://${baseUrl.value}/position")
+            val response: HttpResponse =
+                client.get("http://${settingsViewModel.websocketIp.value}/position")
             response.body()
         } catch (e: Exception) {
             Log.e("getPosition", "Error fetching data: ${e.localizedMessage}", e)
@@ -88,10 +93,11 @@ class RestApiClient {
 
     suspend fun setUpdateRate(updateRate: UpdateRate): Int {
         return try {
-            val response: HttpResponse = client.post("http://${baseUrl.value}/rate") {
-                contentType(ContentType.Application.Json)
-                setBody(updateRate)
-            }
+            val response: HttpResponse =
+                client.post("http://${settingsViewModel.websocketIp.value}/rate") {
+                    contentType(ContentType.Application.Json)
+                    setBody(updateRate)
+                }
             response.status.value
         } catch (e: Exception) {
             Log.e("setUpdateRate", "Error fetching data: ${e.localizedMessage}", e)
@@ -101,10 +107,11 @@ class RestApiClient {
 
     suspend fun setSatelliteSystems(satelliteSystems: SatelliteSystems): Int {
         return try {
-            val response: HttpResponse = client.post("http://${baseUrl.value}/satsystems") {
-                contentType(ContentType.Application.Json)
-                setBody(satelliteSystems)
-            }
+            val response: HttpResponse =
+                client.post("http://${settingsViewModel.websocketIp.value}/satsystems") {
+                    contentType(ContentType.Application.Json)
+                    setBody(satelliteSystems)
+                }
             response.status.value
         } catch (e: Exception) {
             Log.e("setSatelliteSystems", "Error fetching data: ${e.localizedMessage}", e)
@@ -114,10 +121,11 @@ class RestApiClient {
 
     suspend fun setNtripStatus(ntripStatus: NtripStatus): Int {
         return try {
-            val response: HttpResponse = client.post("http://${baseUrl.value}/ntrip") {
-                contentType(ContentType.Application.Json)
-                setBody(ntripStatus)
-            }
+            val response: HttpResponse =
+                client.post("http://${settingsViewModel.websocketIp.value}/ntrip") {
+                    contentType(ContentType.Application.Json)
+                    setBody(ntripStatus)
+                }
             response.status.value
         } catch (e: Exception) {
             Log.e("setNtripStatus", "Error fetching data: ${e.localizedMessage}", e)
@@ -127,10 +135,11 @@ class RestApiClient {
 
     suspend fun setPrecision(precision: Precision): Int {
         return try {
-            val response: HttpResponse = client.post("http://${baseUrl.value}/precision") {
-                contentType(ContentType.Application.Json)
-                setBody(precision)
-            }
+            val response: HttpResponse =
+                client.post("http://${settingsViewModel.websocketIp.value}/precision") {
+                    contentType(ContentType.Application.Json)
+                    setBody(precision)
+                }
             response.status.value
         } catch (e: Exception) {
             Log.e("setPrecision", "Error fetching data: ${e.localizedMessage}", e)
