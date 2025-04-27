@@ -22,6 +22,8 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.Typography
@@ -44,18 +46,17 @@ import androidx.compose.ui.unit.sp
 import de.hhn.gnsstrackingapp.data.NtripStatus
 import de.hhn.gnsstrackingapp.data.UpdateRate
 import de.hhn.gnsstrackingapp.network.RestApiClient
-import de.hhn.gnsstrackingapp.network.WebServicesProvider
 import de.hhn.gnsstrackingapp.ui.theme.Purple40
 import kotlinx.coroutines.launch
-import org.koin.core.context.GlobalContext.get
 
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel) {
-    val ip = settingsViewModel.websocketIp.value
+    settingsViewModel.websocketIp.value
 
     val client = RestApiClient(settingsViewModel)
     val coroutineScope = rememberCoroutineScope()
     val textState = remember { mutableStateOf(TextFieldValue(text = "")) }
+    val snackbarHostState = SnackbarHostState()
 
     val focusManager = LocalFocusManager.current
 
@@ -89,24 +90,50 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
             Text(text = "Rover URL: ${settingsViewModel.websocketIp.value}")
         }
 
+        val websocketIpTextState =
+            mutableStateOf(TextFieldValue(settingsViewModel.websocketIp.value))
+
+
         item {
             SettingsListItem(title = "Websocket IP",
                 description = "Sets the IP address of the GNSS receiver.",
                 icon = Icons.Outlined.Build,
                 content = {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         TextField(
-                            value = settingsViewModel.websocketIp.value,
-                            onValueChange = {
-                                settingsViewModel.websocketIp.value = it
-                            },
-                            modifier = Modifier.requiredWidth(150.dp)
+                            value = websocketIpTextState.value, onValueChange = {
+                                websocketIpTextState.value = it
+                            }, modifier = Modifier.requiredWidth(150.dp)
                         )
                         Button(
                             onClick = {
+                                val inputIp = websocketIpTextState.value.text.trim()
                                 coroutineScope.launch {
-                                    settingsViewModel.restartWebSocket()
-                                    Log.d("SettingsScreen", "WebSocket restarted.")
+                                    focusManager.clearFocus()
+
+                                    if (isValidIp(inputIp)) {
+                                        settingsViewModel.websocketIp.value = inputIp
+                                        settingsViewModel.restartWebSocket()
+                                        Log.d("SettingsScreen", "WebSocket restarted with new IP.")
+
+                                        snackbarHostState.showSnackbar(
+                                            message = "IP address updated successfully.",
+                                            actionLabel = "OK"
+                                        )
+                                    } else {
+                                        Log.e(
+                                            "SettingsScreen",
+                                            "Invalid IP address entered: $inputIp"
+                                        )
+
+                                        snackbarHostState.showSnackbar(
+                                            message = "Invalid IP address. Please enter a valid IPv4 address.",
+                                            actionLabel = "OK"
+                                        )
+                                    }
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(
@@ -119,6 +146,8 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
                     }
                 })
         }
+
+
 
         item {
             SettingsListItem(title = "Toggle NTRIP",
@@ -182,6 +211,10 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
                 content = { SatelliteSystemsSettings(settingsViewModel) })
         }
     }
+
+    SnackbarHost(
+        hostState = snackbarHostState
+    )
 }
 
 
@@ -278,6 +311,13 @@ fun SatelliteSystemsSettings(viewModel: SettingsViewModel) {
             )
         }
     }
+}
+
+fun isValidIp(ip: String): Boolean {
+    val ipRegex =
+        Regex("^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\$")
+
+    return ipRegex.matches(ip)
 }
 
 
