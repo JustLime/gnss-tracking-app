@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "GNSSTrackingApp"
+rootProject.name = "ExternalGNSSTrackingApp"
 include(":app")
  

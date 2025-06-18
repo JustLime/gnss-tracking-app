@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GNSSTrackingApp</string>
+    <string name="app_name">ExternalGNSSTrackingApp</string>
     <string name="map">Map</string>
     <string name="statistics">Statistics</string>
     <string name="settings">Settings</string>

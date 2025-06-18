@@ -59,7 +59,7 @@ directly. If you still want to try it out, you can check out the code in this co
 https://github.com/JustLime/gnss-tracking-app/tree/59d81a0cb17ee5d0139a936a488a7834f0c556ab
 
 Open the project folder in Android Studio and in 
-[BaseApplication.kt](app/src/main/java/de/hhn/gnsstrackingapp/BaseApplication.kt) change the IP
+[BaseApplication.kt](app/src/main/java/de/hhn/externalgnsstrackingapp/BaseApplication.kt) change the IP
 address in the `baseUrl` variable to the IP address of your microcontroller. Afterwards, run the app
 on your physical Android smartphone using Android Studio. Make sure that USB debugging is enabled.
 
@@ -131,7 +131,7 @@ smartphone
 
 ### Launching the App
 
-After opening the app "GNSSTrackingApp" on your Android smartphone you are now redirected to the 
+After opening the app "ExternalGNSSTrackingApp" on your Android smartphone you are now redirected to the 
 Map Screen which is also the Home Screen.
 
 ### Map Screen

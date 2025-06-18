@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "de.hhn.gnsstrackingapp"
+    namespace = "de.hhn.externalgnsstrackingapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "de.hhn.gnsstrackingapp"
+        applicationId = "de.hhn.externalgnsstrackingapp"
         minSdk = 30
         targetSdk = 35
         versionCode = 1

@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "de.hhn.gnsstrackingapp",
+  "applicationId": "de.hhn.externalgnsstrackingapp",
   "variantName": "release",
   "elements": [
     {
