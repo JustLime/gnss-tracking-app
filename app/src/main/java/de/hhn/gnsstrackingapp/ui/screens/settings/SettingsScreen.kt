@@ -115,8 +115,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
                                     focusManager.clearFocus()
 
                                     if (isValidIp(inputIp)) {
-                                        settingsViewModel.websocketIp.value = inputIp
-                                        settingsViewModel.restartWebSocket()
+                                        settingsViewModel.restartWebSocket(inputIp)
                                         Log.d("SettingsScreen", "WebSocket restarted with new IP.")
 
                                         snackbarHostState.showSnackbar(
@@ -128,7 +127,6 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
                                             "SettingsScreen",
                                             "Invalid IP address entered: $inputIp"
                                         )
-
                                         snackbarHostState.showSnackbar(
                                             message = "Invalid IP address. Please enter a valid IPv4 address.",
                                             actionLabel = "OK"
@@ -146,8 +144,6 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
                     }
                 })
         }
-
-
 
         item {
             SettingsListItem(title = "Toggle NTRIP",

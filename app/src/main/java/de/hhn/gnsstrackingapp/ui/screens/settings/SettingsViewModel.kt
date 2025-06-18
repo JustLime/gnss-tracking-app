@@ -9,15 +9,17 @@ import de.hhn.gnsstrackingapp.data.SatelliteSystems
 import de.hhn.gnsstrackingapp.data.UpdateRate
 import de.hhn.gnsstrackingapp.network.WebServicesProvider
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {
-    val websocketIp = mutableStateOf("192.168.106.60")
-    private var webServicesProvider: WebServicesProvider? = null
+    val websocketIp = mutableStateOf("192.168.19.60")
+    private val _webServicesProvider = MutableStateFlow<WebServicesProvider?>(null)
+    val webServicesProvider: StateFlow<WebServicesProvider?> = _webServicesProvider
 
     var ntripStatus = mutableStateOf(NtripStatus(enabled = false))
     val updateRate = mutableStateOf(UpdateRate(0))
-
     val satelliteSystems = mutableStateOf(SatelliteSystems(gps = 0, bds = 0, glo = 0, gal = 0))
 
     val gpsChecked = derivedStateOf { satelliteSystems.value.gps == 1 }
@@ -41,13 +43,35 @@ class SettingsViewModel : ViewModel() {
         satelliteSystems.value = satelliteSystems.value.copy(gal = if (enabled) 1 else 0)
     }
 
-    fun restartWebSocket() {
+    init {
+        createAndStartWebSocket()
+    }
+
+    private fun createAndStartWebSocket() {
+        val provider = WebServicesProvider("ws://${websocketIp.value}:80")
+        _webServicesProvider.value = provider
         viewModelScope.launch {
-            webServicesProvider?.stopSocket()
-            delay(500) // optional safety gap
-            webServicesProvider = WebServicesProvider("ws://${websocketIp.value}:80")
-            webServicesProvider?.startSocket()
+            provider.startSocket()
         }
+    }
+
+    fun restartWebSocket(newIp: String) {
+        websocketIp.value = newIp
+        stopWebSocket()
+        viewModelScope.launch {
+            delay(500)
+            createAndStartWebSocket()
+        }
+    }
+
+    fun stopWebSocket() {
+        _webServicesProvider.value?.stopSocket()
+        _webServicesProvider.value = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopWebSocket()
     }
 }
 

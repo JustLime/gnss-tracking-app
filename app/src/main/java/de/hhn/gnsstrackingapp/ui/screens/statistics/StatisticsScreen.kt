@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.ChipColors
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -24,10 +21,6 @@ import com.google.gson.Gson
 import de.hhn.gnsstrackingapp.R
 import de.hhn.gnsstrackingapp.data.FixType
 import de.hhn.gnsstrackingapp.data.GnssOutput
-import de.hhn.gnsstrackingapp.data.NtripStatus
-import de.hhn.gnsstrackingapp.data.SatelliteSystems
-import de.hhn.gnsstrackingapp.network.RestApiClient
-import de.hhn.gnsstrackingapp.network.WebServicesProvider
 import de.hhn.gnsstrackingapp.ui.screens.settings.SettingsViewModel
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -36,22 +29,10 @@ import java.math.RoundingMode
 fun StatisticsScreen(
     settingsViewModel: SettingsViewModel,
     statisticsViewModel: StatisticsViewModel,
-    webServicesProvider: WebServicesProvider
 ) {
-    val gnssOutput by statisticsViewModel.gnssOutput // Observe gnssOutput from ViewModel
-    val gnssSatelliteSystemsState = remember { mutableStateOf(SatelliteSystems(0, 0, 0, 0)) }
-    val gnssNtripStatusState = remember { mutableStateOf(NtripStatus(false)) }
-
-    // Fetch GNSS data when the composable is displayed
-    LaunchedEffect(Unit) {
-        if (webServicesProvider.connected.value) {
-            val client = RestApiClient(settingsViewModel)
-            gnssSatelliteSystemsState.value = client.getSatelliteSystems()
-
-//            client.setNtripStatus(NtripStatus(true))
-            gnssNtripStatusState.value = client.getNtripStatus()
-        }
-    }
+    val gnssOutput by statisticsViewModel.gnssOutput
+    val provider = settingsViewModel.webServicesProvider.collectAsState().value
+    val isConnected = provider?.connected?.collectAsState()?.value ?: false
 
     Column(
         modifier = Modifier.padding(16.dp),
@@ -62,7 +43,7 @@ fun StatisticsScreen(
             fontSize = Typography().headlineLarge.fontSize
         )
 
-        ConnectedWebSocketChip(webServicesProvider)
+        ConnectedWebSocketChip(isConnected)
 
         ElevatedCard {
             Column(
@@ -72,15 +53,17 @@ fun StatisticsScreen(
             ) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = stringResource(R.string.time))
-                    Text(text = if (gnssOutput.time.isNotEmpty()) parseTime(gnssOutput.time) else "N/A")
+                    Text(text = if (gnssOutput.time.isNotEmpty()) parseTime(gnssOutput.time)
+                    else "N/A")
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = stringResource(R.string.latitude))
                     Text(
                         text = if (gnssOutput.lat.isNotEmpty()) "${
-                            BigDecimal(
-                                convertToDecimalDegrees(gnssOutput.lat)
-                            ).setScale(7, RoundingMode.HALF_UP)
+                            BigDecimal(convertToDecimalDegrees(gnssOutput.lat)).setScale(
+                                7,
+                                RoundingMode.HALF_UP
+                            )
                         }°" else "N/A"
                     )
                 }
@@ -88,11 +71,7 @@ fun StatisticsScreen(
                     Text(text = stringResource(R.string.longitude))
                     Text(
                         text = if (gnssOutput.lon.isNotEmpty()) "${
-                            BigDecimal(
-                                convertToDecimalDegrees(
-                                    gnssOutput.lon
-                                )
-                            ).setScale(
+                            BigDecimal(convertToDecimalDegrees(gnssOutput.lon)).setScale(
                                 7,
                                 RoundingMode.HALF_UP
                             )
@@ -125,27 +104,24 @@ fun StatisticsScreen(
 }
 
 @Composable
-fun ConnectedWebSocketChip(webServicesProvider: WebServicesProvider) {
-    val chipColors: ChipColors = if (webServicesProvider.connected.value) {
-        AssistChipDefaults.assistChipColors(
-            containerColor = Color.Green
-        )
+fun ConnectedWebSocketChip(isConnected: Boolean) {
+    val chipColors = if (isConnected) {
+        AssistChipDefaults.assistChipColors(containerColor = Color.Green)
     } else {
-        AssistChipDefaults.assistChipColors(
-            containerColor = Color.Red
-        )
+        AssistChipDefaults.assistChipColors(containerColor = Color.Red)
     }
 
-    AssistChip(onClick = {}, label = {
-        Text(
-            text = if (webServicesProvider.connected.value) stringResource(R.string.connected_to_websocket)
-            else stringResource(R.string.disconnected_from_websocket),
-            color = Color.Black
-        )
-    }, colors = chipColors
+    AssistChip(
+        onClick = {},
+        label = {
+            Text(
+                text = if (isConnected) "Connected to Rover" else "Disconnected from Rover",
+                color = Color.Black
+            )
+        },
+        colors = chipColors
     )
 }
-
 
 fun parseGnssJson(json: String): GnssOutput {
     return try {
@@ -176,4 +152,3 @@ private fun convertToDecimalDegrees(coordinate: String): Double {
     val minutes = rawValue % 100
     return degrees + (minutes / 60)
 }
-

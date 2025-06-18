@@ -25,6 +25,7 @@ import de.hhn.gnsstrackingapp.ui.screens.settings.SettingsViewModel
 import de.hhn.gnsstrackingapp.ui.screens.statistics.StatisticsViewModel
 import de.hhn.gnsstrackingapp.ui.screens.statistics.parseGnssJson
 import de.hhn.gnsstrackingapp.ui.theme.GNSSTrackingAppTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.osmdroid.util.GeoPoint
@@ -32,7 +33,6 @@ import org.osmdroid.util.GeoPoint
 
 class MainActivity : ComponentActivity() {
     private lateinit var serviceManager: ServiceManager
-    private lateinit var webServicesProvider: WebServicesProvider
 
     private val mapViewModel: MapViewModel by viewModel()
     private val locationViewModel: LocationViewModel by viewModel()
@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         serviceManager = ServiceManager(this)
 
         val requestPermissionLauncher =
@@ -64,17 +63,7 @@ class MainActivity : ComponentActivity() {
             locationViewModel.updateLocation(GeoPoint(latitude, longitude), locationName, accuracy)
         }
 
-        val webServicesProvider = WebServicesProvider("ws://${settingsViewModel.websocketIp.value}:80")
-        lifecycleScope.launch {
-            webServicesProvider.startSocket()
-        }
-        lifecycleScope.launch {
-            for (socketUpdate in webServicesProvider.socketEventChannel) {
-                socketUpdate.text?.let { jsonData ->
-                    statisticsViewModel.updateGnssOutput(parseGnssJson(jsonData))
-                }
-            }
-        }
+        observeWebSocketEvents()
 
         setContent {
             GNSSTrackingAppTheme {
@@ -93,7 +82,6 @@ class MainActivity : ComponentActivity() {
                                 locationViewModel,
                                 statisticsViewModel,
                                 settingsViewModel,
-                                webServicesProvider
                             )
                         }
                     })
@@ -102,10 +90,41 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
-
         serviceManager.stopLocationService()
-        webServicesProvider.stopSocket()
+        settingsViewModel.stopWebSocket()
     }
+
+    private fun observeWebSocketEvents() {
+        lifecycleScope.launch {
+            var currentProvider: WebServicesProvider? = null
+
+            while (true) {
+                val provider = settingsViewModel.webServicesProvider
+                if (provider.value != currentProvider) {
+                    currentProvider = provider.value
+                    Log.d("MainActivity", "Attaching to WebSocket updates for new provider...")
+
+                    launch {
+                        try {
+                            for (update in provider.value?.socketEventChannel!!) {
+                                update.text?.let { jsonData ->
+                                    statisticsViewModel.updateGnssOutput(parseGnssJson(jsonData))
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("MainActivity", "WebSocket listener error: ${e.message}", e)
+                        }
+                        Log.d("MainActivity", "WebSocket updates listener finished.")
+                    }
+                }
+
+                delay(500)
+            }
+        }
+    }
+
 }
+
