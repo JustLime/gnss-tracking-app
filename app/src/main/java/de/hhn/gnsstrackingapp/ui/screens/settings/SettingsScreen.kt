@@ -18,12 +18,12 @@ import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.Typography
@@ -264,15 +264,14 @@ fun SettingsListItem(
 }
 
 @Composable
-fun SatelliteSystemsCheckbox(
-    satChecked: Boolean, onCheckedChange: (satChecked: Boolean) -> Unit, label: String
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(
-            checked = satChecked,
+fun SatelliteSystemsSwitch(checked: Boolean,onCheckedChange: (Boolean) -> Unit, label: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Switch(
+            checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(
-                checkmarkColor = Color.White, checkedColor = Purple40
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = Purple40
             )
         )
         Text(label)
@@ -282,26 +281,26 @@ fun SatelliteSystemsCheckbox(
 @Composable
 fun SatelliteSystemsSettings(viewModel: SettingsViewModel) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row {
-            SatelliteSystemsCheckbox(
-                satChecked = viewModel.gpsChecked.value,
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            SatelliteSystemsSwitch(
+                checked  = viewModel.gpsChecked.value,
                 onCheckedChange = { viewModel.updateGps(it) },
                 label = "GPS"
             )
-            SatelliteSystemsCheckbox(
-                satChecked = viewModel.bdsChecked.value,
+            SatelliteSystemsSwitch(
+                checked  = viewModel.bdsChecked.value,
                 onCheckedChange = { viewModel.updateBds(it) },
                 label = "BeiDou"
             )
         }
-        Row {
-            SatelliteSystemsCheckbox(
-                satChecked = viewModel.gloChecked.value,
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            SatelliteSystemsSwitch(
+                checked  = viewModel.gloChecked.value,
                 onCheckedChange = { viewModel.updateGlo(it) },
                 label = "Glonass"
             )
-            SatelliteSystemsCheckbox(
-                satChecked = viewModel.galChecked.value,
+            SatelliteSystemsSwitch(
+                checked  = viewModel.galChecked.value,
                 onCheckedChange = { viewModel.updateGal(it) },
                 label = "Galileo"
             )
